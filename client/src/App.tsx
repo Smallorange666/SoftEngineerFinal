@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { AuditOutlined, CarOutlined, UserOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Breadcrumb, Layout, Menu, theme } from "antd";
+import VehiclePage from "./vehiclesPage.tsx";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -25,9 +26,8 @@ const items: MenuItem[] = [
   getItem("车辆管理", "1", <CarOutlined />),
   getItem("客户管理", "2", <UserOutlined />),
   getItem("租赁管理", "sub1", <AuditOutlined />, [
-    getItem("Tom", "3"),
-    getItem("Bill", "4"),
-    getItem("Alex", "5"),
+    getItem("进行中", "3"),
+    getItem("已结束", "4"),
   ]),
 ];
 
@@ -43,9 +43,29 @@ const headerStyle: React.CSSProperties = {
 
 const App: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [selectedKey, setSelectedKey] = useState("1"); // 默认选中车辆管理
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  const handleMenuClick = (e: any) => {
+    setSelectedKey(e.key);
+  };
+
+  const renderContent = () => {
+    switch (selectedKey) {
+      case "1":
+        return <VehiclePage />;
+      case "2":
+        return <div>客户管理页面</div>;
+      case "3":
+        return <div>进行中的租赁</div>;
+      case "4":
+        return <div>已结束的租赁</div>;
+      default:
+        return <div>请选择一个菜单项</div>;
+    }
+  };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -63,6 +83,7 @@ const App: React.FC = () => {
               defaultSelectedKeys={["1"]}
               mode="inline"
               items={items}
+              onClick={handleMenuClick}
             />
           </Sider>
           <Layout>
@@ -80,7 +101,7 @@ const App: React.FC = () => {
                   borderRadius: borderRadiusLG,
                 }}
               >
-                Bill is a cat.
+                {renderContent()}
               </div>
             </Content>
             <Footer style={{ textAlign: "center" }}>
