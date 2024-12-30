@@ -1,5 +1,5 @@
 export interface AppProps {
-  user: { id: number; username: string; role: string } | null;
+  user: { user_id: number; username: string; role: string } | null;
   onLogout: () => void;
 }
 
@@ -18,7 +18,7 @@ export interface VehicleInfo extends Vehicle {
 }
 
 export interface VehiclesPageProps {
-  user: { id: number; role: string } | null;
+  user: { user_id: number; role: string } | null;
 }
 
 export interface AddVehicleModalProps {

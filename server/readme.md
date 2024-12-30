@@ -59,6 +59,7 @@
 | 字段名 | 类型 | 说明 | 约束 |
 |--------|------|------|------|
 | customer_id | SERIAL | 客户ID | PRIMARY KEY |
+| user_id | INTEGER | 用户ID | FOREIGN KEY |
 | name | VARCHAR(100) | 客户姓名 | NOT NULL |
 | phone | VARCHAR(20) | 联系电话 | NOT NULL |
 | address | TEXT | 居住地址 | NOT NULL |

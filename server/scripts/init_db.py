@@ -1,18 +1,11 @@
+from werkzeug.security import generate_password_hash
+from app.models import User
+from app.models import Vehicle
+from app import create_app, db
 import json
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from hashlib import sha256
-from app import create_app, db
-from app.models import Vehicle
-from app.models import User
-
-
-# 生成纯 SHA-256 哈希值
-
-def generate_sha256_hash(password: str) -> str:
-    return sha256(password.encode('utf-8')).hexdigest()
 
 
 def init_db():
@@ -54,18 +47,13 @@ def init_db():
         if User.query.count() == 0:
             admin = User(
                 username='admin',
-                password_hash=generate_sha256_hash('admin'),
-                role='admin'
-            )
-            user = User(
-                username='user',
-                password_hash=generate_sha256_hash('user'),
-                role='user'
+                password_hash=generate_password_hash(
+                    'admin'),  # 使用 bcrypt 哈希密码
+                role='admin',
             )
             db.session.add(admin)
-            db.session.add(user)
             db.session.commit()
-            print("成功添加管理员账号和普通用户账号！")
+            print("成功添加管理员账号！")
 
 
 if __name__ == '__main__':

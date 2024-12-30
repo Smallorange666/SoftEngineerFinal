@@ -29,7 +29,7 @@ function getItem(
   } as MenuItem;
 }
 
-const userMenuItems: MenuItem[] = [getItem("车辆清单", "1", <CarOutlined />)];
+const customerMenuItems: MenuItem[] = [getItem("车辆清单", "1", <CarOutlined />)];
 
 // 管理员专属菜单项配置
 const adminMenuItems: MenuItem[] = [
@@ -46,8 +46,8 @@ const getMenuItems = (role: string): MenuItem[] => {
   switch (role) {
     case "admin":
       return [...adminMenuItems];
-    case "user":
-      return [...userMenuItems];
+    case "customer":
+      return [...customerMenuItems];
     default:
       return [];
   }
@@ -82,7 +82,7 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
     switch (selectedKey) {
       case "1":
         return user ? (
-          <VehiclePage user={{ id: user.id, role: user.role }} />
+          <VehiclePage user={{ user_id: user.user_id, role: user.role }} />
         ) : null;
       case "2":
         return user?.role === "admin" ? <div>客户管理页面</div> : null;

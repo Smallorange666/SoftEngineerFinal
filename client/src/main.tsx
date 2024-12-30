@@ -11,7 +11,7 @@ import LoginPage from "./LoginPage";
 
 const Root: React.FC = () => {
   const [user, setUser] = useState<{
-    id: number;
+    user_id: number;
     username: string;
     role: string;
   } | null>(null); // 用户状态

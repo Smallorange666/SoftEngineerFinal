@@ -218,7 +218,7 @@ const VehiclesPage: React.FC<VehiclesPageProps> = ({ user }) => {
             </Button>
           )}
           {/* 普通用户显示“租赁”按钮 */}
-          {user?.role === "user" && (
+          {user?.role === "customer" && (
             <Button
               type="link"
               onClick={() => {
@@ -292,37 +292,60 @@ const VehiclesPage: React.FC<VehiclesPageProps> = ({ user }) => {
   }) => {
     console.log(selectedVehicleId, values);
 
-    if (!selectedVehicleId) return; // 如果没有选中车辆，直接返回
+    if (!selectedVehicleId) {
+      message.error("未选择车辆，无法租赁");
+      return;
+    }
 
-    // 调用 API 处理租赁逻辑
-    fetch("http://localhost:5000/api/rentals", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        vehicle_id: selectedVehicleId,
-        customer_id: user?.id,
-        start_time: values.start_time,
-        duration_days: values.duration_days,
-      }),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          return res.json().then((errorData) => {
-            throw new Error(errorData.error);
-          });
-        }
+    try {
+      // 第一步：根据 user_id 查询 customer_id
+      if (!user) {
+        message.error("用户未登录，无法租赁");
+        return;
+      }
 
-        // 租赁成功后刷新数据
-        fetchData();
-        message.success("租赁成功");
-        setIsRentModalOpen(false); // 关闭 Modal
-      })
-      .catch((error) => {
-        message.error("租赁失败：" + error.message);
-        console.error("Error renting vehicle:", error);
+      const customerResponse = await fetch(
+        `http://localhost:5000/api/customers/${user.user_id}`
+      );
+      if (!customerResponse.ok) {
+        const errorData = await customerResponse.json();
+        throw new Error(errorData.error || "无法获取客户信息");
+      }
+
+      const customerData = await customerResponse.json();
+      const customerId = customerData.customer_id;
+
+      if (!customerId) {
+        throw new Error("未找到对应的客户信息");
+      }
+
+      // 第二步：调用 API 处理租赁逻辑
+      const rentalResponse = await fetch("http://localhost:5000/api/rentals", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          vehicle_id: selectedVehicleId,
+          customer_id: customerId,
+          start_time: values.start_time,
+          duration_days: values.duration_days,
+        }),
       });
+
+      if (!rentalResponse.ok) {
+        const errorData = await rentalResponse.json();
+        throw new Error(errorData.error || "租赁失败");
+      }
+
+      // 租赁成功后刷新数据
+      fetchData();
+      message.success("租赁成功");
+      setIsRentModalOpen(false); // 关闭 Modal
+    } catch (error: any) {
+      message.error("租赁失败：" + error.message);
+      console.error("Error renting vehicle:", error);
+    }
   };
 
   // 获取数据
