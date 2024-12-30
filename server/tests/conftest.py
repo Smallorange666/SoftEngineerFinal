@@ -1,13 +1,14 @@
 import pytest
 from datetime import datetime, timedelta
 from app import create_app, db
-from app.models import Vehicle, Customer, Rental
+from app.models import Vehicle, Customer, Rental, User
 from config import TestConfig
 
 @pytest.fixture
 def app():
     app = create_app(TestConfig)
     with app.app_context():
+        db.drop_all()
         db.create_all()
         yield app
         db.session.remove()
@@ -64,3 +65,21 @@ def test_rental(app, test_vehicle, test_customer):
     db.session.add(rental)
     db.session.commit()
     return rental 
+
+@pytest.fixture
+def test_user(app):
+    """创建测试用户"""
+    with app.app_context():
+        user = User(
+            username='testuser',
+            password_hash='test_hash_value123',
+            role='user'
+        )
+        db.session.add(user)
+        db.session.commit()
+        
+        yield user
+        
+        # 清理测试数据
+        db.session.delete(user)
+        db.session.commit() 

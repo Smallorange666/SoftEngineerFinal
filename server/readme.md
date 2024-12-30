@@ -67,6 +67,15 @@
 | created_at | TIMESTAMP | 创建时间 | DEFAULT NOW() |
 | updated_at | TIMESTAMP | 更新时间 | DEFAULT NOW() |
 
+### 用户表（users）
+
+| 字段名 | 类型 | 说明 | 约束 |
+|--------|------|------|------|
+| user_id | SERIAL | 用户ID | PRIMARY KEY |
+| username | VARCHAR(50) | 用户名 | NOT NULL |
+| password_hash | VARCHAR(128) | 密码哈希 | NOT NULL |
+| role | VARCHAR(20) | 角色(admin/staff) | NOT NULL |
+
 ## API接口设计
 
 将提供RESTful API，包括：
@@ -90,8 +99,31 @@
 - PUT /api/customers/{id} - 更新客户信息
 - GET /api/customers/{id}/rentals - 获取客户租赁历史
 
-## 部署要求
+### 用户相关
 
-- Python 3.8+
-- PostgreSQL 12+
-- pip requirements将在requirements.txt中详细列出
+- GET /api/user?username=${username} - 获取用户所有信息，没有则返回空
+
+## 部署指引
+
+1. 安装依赖
+
+```bash
+pip install -r requirements.txt
+```
+
+2. 配置数据库 
+
+修改config.py中的数据库配置为自己的数据库配置
+
+3. 安装项目
+
+```bash
+pip install -e .
+```
+
+4. 运行项目
+
+```bash
+flask run
+```
+

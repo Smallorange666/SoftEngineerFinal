@@ -1,13 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='car_rental',
-    version='1.0',
+    name="car-rental-system",
     packages=find_packages(),
-    install_requires=[
-        'Flask',
-        'Flask-SQLAlchemy',
-        'Flask-Migrate',
-        'psycopg2-binary',
-    ]
+    python_requires=">=3.8",
 ) 
