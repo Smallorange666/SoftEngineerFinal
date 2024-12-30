@@ -8,7 +8,7 @@ import {
 import type { MenuProps } from "antd";
 import { Breadcrumb, Layout, Menu, theme, Button } from "antd";
 import { useNavigate } from "react-router-dom"; // 引入 useNavigate
-import VehiclePage from "./vehiclesPage.tsx";
+import VehiclePage from "./VehiclesPage.tsx";
 
 const { Header, Content, Footer, Sider } = Layout;
 

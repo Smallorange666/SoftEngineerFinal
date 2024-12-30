@@ -4,9 +4,9 @@ import { Button, Form, Input, Card, message } from "antd";
 import { sha256 } from "crypto-hash"; // 用于哈希密码
 
 interface User {
-  id: number;
+  user_id: number;
   username: string;
-  passwordHash: string;
+  password_hash: string;
   role: string;
 }
 
@@ -22,30 +22,41 @@ const LoginPage: React.FC<{
   const [form] = Form.useForm();
 
   const fetchUser = async (username: string) => {
-    try {
-      const response = await fetch(`/api/user?username=${username}`);
-      if (!response.ok) {
-        throw new Error("服务器出问题啦，请稍后再试");
-      }
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message); // 用户不存在
-      }
-      return data;
-    } catch (error) {
+    const response = await fetch(
+      `http://localhost:5000/api/user?username=${username}`
+    );
+    if (!response.ok) {
       throw new Error("服务器出问题啦，请稍后再试");
     }
+    return response.json(); // 返回解析后的 JSON 数据
   };
 
   const onFinish = async (values: { username: string; password: string }) => {
     setLoading(true);
     try {
       // 拉取用户信息
-      const user = await fetchUser(values.username);
+      const userData = await fetchUser(values.username);
+
+      // 检查响应数据是否为空
+      if (!userData || Object.keys(userData).length === 0) {
+        message.error("用户不存在");
+        form.setFields([{ name: "username", errors: ["用户不存在"] }]);
+        return;
+      }
+
+      // 解析用户数据
+      const user: User = {
+        user_id: userData.user_id,
+        username: userData.username,
+        password_hash: userData.password_hash,
+        role: userData.role,
+      };
 
       // 哈希输入的密码
       const passwordHash = await sha256(values.password);
-      if (passwordHash !== user.passwordHash) {
+
+      // 检查密码是否正确
+      if (passwordHash !== user.password_hash) {
         message.error("密码错误");
         form.setFields([{ name: "password", errors: ["密码错误"] }]);
         return;
@@ -53,15 +64,14 @@ const LoginPage: React.FC<{
 
       // 登录成功
       message.success("登录成功");
-      onLoginSuccess({ id: user.id, username: user.username, role: user.role });
+      onLoginSuccess({
+        id: user.user_id,
+        username: user.username,
+        role: user.role,
+      });
       navigate("/"); // 跳转到主页面
     } catch (error: any) {
-      if (error.message === "用户不存在") {
-        message.error("用户不存在");
-        form.setFields([{ name: "username", errors: ["用户不存在"] }]);
-      } else {
-        message.error("服务器出问题啦，请稍后再试");
-      }
+      message.error("服务器出问题啦，请稍后再试");
     } finally {
       setLoading(false);
     }
