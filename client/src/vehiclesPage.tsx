@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import type { GetProp, TableProps } from "antd";
-import { Table, Input, Button, Space } from "antd";
-import type {
-  SorterResult,
-  FilterDropdownProps,
-} from "antd/es/table/interface";
-import { SearchOutlined } from "@ant-design/icons";
+import { Table, Input, Button, Space, message } from "antd";
+import type { FilterDropdownProps } from "antd/es/table/interface";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
+import AddVehicleModal from "./components/AddVehiclesModal";
+import { Vehicle } from "./types";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -14,22 +13,12 @@ type TablePaginationConfig = Exclude<
   boolean
 >;
 
-interface DataType {
-  vehicle_id: number;
-  plate_number: string;
-  type: string;
-  brand: string;
-  model: string;
-  color: string;
-  price_per_day: number;
-}
-
 interface TableParams {
   pagination?: TablePaginationConfig;
 }
 
 const VehiclesPage: React.FC = () => {
-  const [data, setData] = useState<DataType[]>();
+  const [data, setData] = useState<Vehicle[]>();
   const [loading, setLoading] = useState(false);
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
@@ -39,13 +28,24 @@ const VehiclesPage: React.FC = () => {
   });
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const searchInput = useRef<any>(null);
+
+  // 打开新增车辆浮层
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  // 关闭新增车辆浮层
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   // 搜索逻辑
   const handleSearch = (
     selectedKeys: string[],
     confirm: FilterDropdownProps["confirm"],
-    dataIndex: keyof DataType
+    dataIndex: keyof Vehicle
   ) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -58,8 +58,8 @@ const VehiclesPage: React.FC = () => {
   };
 
   const getColumnSearchProps = (
-    dataIndex: keyof DataType
-  ): Exclude<TableProps<DataType>["columns"], undefined>[number] => ({
+    dataIndex: keyof Vehicle
+  ): Exclude<TableProps<Vehicle>["columns"], undefined>[number] => ({
     filterDropdown: ({
       setSelectedKeys,
       selectedKeys,
@@ -144,7 +144,7 @@ const VehiclesPage: React.FC = () => {
   });
 
   // 列定义
-  const columns: ColumnsType<DataType> = [
+  const columns: ColumnsType<Vehicle> = [
     {
       title: "ID",
       dataIndex: "vehicle_id",
@@ -206,12 +206,49 @@ const VehiclesPage: React.FC = () => {
     fetch(`http://localhost:5000/api/vehicles/${vehicleId}`, {
       method: "DELETE",
     })
-      .then(() => {
+      .then((res) => {
+        if (!res.ok) {
+          // 如果响应状态码不是 2xx，解析错误信息
+          return res.json().then((errorData) => {
+            throw new Error(errorData.error);
+          });
+        }
         // 删除成功后重新加载数据
         fetchData();
+        message.success("车辆删除成功");
       })
       .catch((error) => {
+        // 显示错误提示
+        message.error("车辆删除失败：" + error.message);
         console.error("Error deleting vehicle:", error);
+      });
+  };
+
+  const handleCreate = async (values: Omit<Vehicle, "vehicle_id">) => {
+    // 调用 API 创建车辆
+    fetch("http://localhost:5000/api/vehicles", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          // 如果响应状态码不是 2xx，解析错误信息
+          return res.json().then((errorData) => {
+            throw new Error(errorData.error);
+          });
+        }
+        // 创建成功后重新加载数据
+        fetchData();
+        message.success("车辆创建成功");
+        setIsModalOpen(false); // 关闭 Modal
+      })
+      .catch((error) => {
+        // 显示错误提示
+        message.error("车辆创建失败：" + error.message);
+        console.error("Error creating vehicle:", error);
       });
   };
 
@@ -250,6 +287,7 @@ const VehiclesPage: React.FC = () => {
         }
       })
       .catch((error) => {
+        message.error("获取数据失败，请稍后再试");
         console.error("Error fetching data:", error);
         setLoading(false);
       });
@@ -259,7 +297,7 @@ const VehiclesPage: React.FC = () => {
     fetchData();
   }, [tableParams.pagination?.current, tableParams.pagination?.pageSize]);
 
-  const handleTableChange: TableProps<DataType>["onChange"] = (pagination) => {
+  const handleTableChange: TableProps<Vehicle>["onChange"] = (pagination) => {
     setTableParams({
       pagination,
     });
@@ -270,14 +308,34 @@ const VehiclesPage: React.FC = () => {
   };
 
   return (
-    <Table<DataType>
-      columns={columns}
-      rowKey={(record) => record.vehicle_id.toString()}
-      dataSource={data}
-      pagination={tableParams.pagination}
-      loading={loading}
-      onChange={handleTableChange}
-    />
+    <div>
+      {/* 新增车辆按钮 */}
+      <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={showModal}
+        style={{ marginBottom: 16 }}
+      >
+        新增车辆
+      </Button>
+
+      {/* 车辆表格 */}
+      <Table<Vehicle>
+        columns={columns}
+        rowKey={(record) => record.vehicle_id.toString()}
+        dataSource={data}
+        pagination={tableParams.pagination}
+        loading={loading}
+        onChange={handleTableChange}
+      />
+
+      {/* 新增车辆浮层 */}
+      <AddVehicleModal
+        visible={isModalOpen}
+        onCancel={handleCancel}
+        onCreate={handleCreate}
+      />
+    </div>
   );
 };
 

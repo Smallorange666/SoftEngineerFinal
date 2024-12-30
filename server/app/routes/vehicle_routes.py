@@ -2,6 +2,10 @@ from flask import jsonify, request
 from app.routes import bp
 from app.models import Vehicle, Rental
 from app import db
+import re
+
+# 假设车牌号格式为：1个汉字 + 1个字母 + 5个字母或数字（例如：京A12345）
+PLATE_NUMBER_PATTERN = re.compile(r'^[\u4e00-\u9fa5][A-Z][A-Z0-9]{5}$')
 
 
 @bp.route('/api/vehicles', methods=['GET'])
@@ -19,12 +23,6 @@ def get_vehicles():
         'data': [vehicle.to_dict() for vehicle in vehicles.items],
         'total': vehicles.total
     })
-
-
-@bp.route('/api/vehicles/<int:id>', methods=['GET'])
-def get_vehicle(id):
-    vehicle = Vehicle.query.get_or_404(id)
-    return jsonify(vehicle.to_dict())
 
 
 @bp.route('/api/vehicles', methods=['POST'])
@@ -45,6 +43,11 @@ def create_vehicle():
             return jsonify({'error': 'Price must be positive'}), 400
     except ValueError:
         return jsonify({'error': 'Invalid price format'}), 400
+
+    # 验证车牌号格式
+    plate_number = data['plate_number']
+    if not PLATE_NUMBER_PATTERN.match(plate_number):
+        return jsonify({'error': 'Invalid plate number format'}), 400
 
     # 检查车牌号是否已存在
     if Vehicle.query.filter_by(plate_number=data['plate_number']).first():
