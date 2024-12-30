@@ -6,8 +6,8 @@ import {
   LoginOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Breadcrumb, Layout, Menu, theme, Button } from "antd";
-import { useNavigate } from "react-router-dom"; // 引入 useNavigate
+import { Layout, Menu, theme, Button } from "antd";
+import { useNavigate } from "react-router-dom";
 import VehiclePage from "./VehiclesPage.tsx";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -33,7 +33,10 @@ function getItem(
   } as MenuItem;
 }
 
-const items: MenuItem[] = [
+const userMenuItems: MenuItem[] = [getItem("车辆清单", "1", <CarOutlined />)];
+
+// 管理员专属菜单项配置
+const adminMenuItems: MenuItem[] = [
   getItem("车辆管理", "1", <CarOutlined />),
   getItem("客户管理", "2", <UserOutlined />),
   getItem("租赁管理", "sub1", <AuditOutlined />, [
@@ -41,6 +44,18 @@ const items: MenuItem[] = [
     getItem("已结束", "4"),
   ]),
 ];
+
+// 根据用户角色生成菜单项
+const getMenuItems = (role: string): MenuItem[] => {
+  switch (role) {
+    case "admin":
+      return [...adminMenuItems];
+    case "user":
+      return [...userMenuItems];
+    default:
+      return [];
+  }
+};
 
 const headerStyle: React.CSSProperties = {
   textAlign: "left",
@@ -51,8 +66,8 @@ const headerStyle: React.CSSProperties = {
   backgroundColor: "#4096ff",
   fontSize: 20,
   display: "flex",
-  justifyContent: "space-between", // 将内容分散对齐
-  alignItems: "center", // 垂直居中
+  justifyContent: "space-between",
+  alignItems: "center",
 };
 
 const App: React.FC<AppProps> = ({ user, onLogout }) => {
@@ -61,7 +76,7 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-  const navigate = useNavigate(); // 获取 navigate 函数
+  const navigate = useNavigate();
 
   const handleMenuClick = (e: any) => {
     setSelectedKey(e.key);
@@ -72,11 +87,11 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
       case "1":
         return <VehiclePage />;
       case "2":
-        return <div>客户管理页面</div>;
+        return user?.role === "admin" ? <div>客户管理页面</div> : null;
       case "3":
-        return <div>进行中的租赁</div>;
+        return user?.role === "admin" ? <div>进行中的租赁</div> : null;
       case "4":
-        return <div>已结束的租赁</div>;
+        return user?.role === "admin" ? <div>已结束的租赁</div> : null;
       default:
         return <div>请选择一个菜单项</div>;
     }
@@ -112,17 +127,13 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
               theme="dark"
               defaultSelectedKeys={["1"]}
               mode="inline"
-              items={items}
+              items={getMenuItems(user?.role || "")}
               onClick={handleMenuClick}
             />
           </Sider>
           <Layout>
             <Header style={{ padding: 0, background: colorBgContainer }} />
             <Content style={{ margin: "0 16px" }}>
-              <Breadcrumb style={{ margin: "16px 0" }}>
-                <Breadcrumb.Item>User</Breadcrumb.Item>
-                <Breadcrumb.Item>Bill</Breadcrumb.Item>
-              </Breadcrumb>
               <div
                 style={{
                   padding: 24,

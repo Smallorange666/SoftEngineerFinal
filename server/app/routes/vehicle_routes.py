@@ -8,8 +8,18 @@ VALID_VEHICLE_STATUS = ['可租用', '已租出', '维修中']
 
 @bp.route('/api/vehicles', methods=['GET'])
 def get_vehicles():
-    vehicles = Vehicle.query.all()
-    return jsonify([vehicle.to_dict() for vehicle in vehicles])
+    # 获取分页参数
+    page = request.args.get('page', default=1, type=int)
+    page_size = request.args.get('pageSize', default=10, type=int)
+
+    # 查询数据
+    vehicles = Vehicle.query.paginate(page=page, per_page=page_size, error_out=False)
+
+    # 返回分页后的数据
+    return jsonify({
+        'data': [vehicle.to_dict() for vehicle in vehicles.items],
+        'total': vehicles.total
+    })
 
 @bp.route('/api/vehicles/<int:id>', methods=['GET'])
 def get_vehicle(id):
