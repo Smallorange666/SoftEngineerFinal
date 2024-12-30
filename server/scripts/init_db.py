@@ -28,7 +28,9 @@ def init_db():
 
         if Vehicle.query.count() == 0:
             # 从 vehicles.json 文件中读取数据
-            with open("vehicles.json", "r", encoding="utf-8") as f:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            file_path = os.path.join(script_dir, "vehicles.json")
+            with open(file_path, "r", encoding="utf-8") as f:
                 vehicles_data = json.load(f)
 
             # 将数据转换为 Vehicle 对象
