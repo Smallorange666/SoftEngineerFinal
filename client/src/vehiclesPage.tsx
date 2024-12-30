@@ -11,13 +11,13 @@ type TablePaginationConfig = Exclude<
 
 interface DataType {
   vehicle_id: number;
+  plate_number: string;
   type: string;
   brand: string;
   model: string;
   color: string;
   price_per_day: number;
   status: string;
-  plate_number: string;
 }
 
 interface TableParams {
@@ -32,47 +32,47 @@ const columns: ColumnsType<DataType> = [
     title: "ID",
     dataIndex: "vehicle_id",
     sorter: true,
-    width: "10%",
+    width: "5%",
   },
   {
-    title: "Type",
+    title: "车牌号",
+    dataIndex: "plate_number",
+    sorter: true,
+    width: "15%",
+  },
+  {
+    title: "车辆类型",
     dataIndex: "type",
     sorter: true,
     width: "15%",
   },
   {
-    title: "Brand",
+    title: "品牌",
     dataIndex: "brand",
     sorter: true,
     width: "15%",
   },
   {
-    title: "Model",
+    title: "型号",
     dataIndex: "model",
     sorter: true,
     width: "15%",
   },
   {
-    title: "Color",
+    title: "颜色",
     dataIndex: "color",
     sorter: true,
     width: "10%",
   },
   {
-    title: "Price per Day",
+    title: "日租金（元）",
     dataIndex: "price_per_day",
     sorter: true,
     width: "15%",
   },
   {
-    title: "Status",
+    title: "状态",
     dataIndex: "status",
-    sorter: true,
-    width: "10%",
-  },
-  {
-    title: "Plate Number",
-    dataIndex: "plate_number",
     sorter: true,
     width: "10%",
   },

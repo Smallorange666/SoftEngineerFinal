@@ -1,12 +1,23 @@
 import React, { useState } from "react";
-import { AuditOutlined, CarOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  AuditOutlined,
+  CarOutlined,
+  UserOutlined,
+  LoginOutlined,
+} from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Breadcrumb, Layout, Menu, theme } from "antd";
+import { Breadcrumb, Layout, Menu, theme, Button } from "antd";
+import { useNavigate } from "react-router-dom"; // 引入 useNavigate
 import VehiclePage from "./vehiclesPage.tsx";
 
 const { Header, Content, Footer, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>["items"][number];
+
+interface AppProps {
+  user: { id: number; username: string; role: string } | null;
+  onLogout: () => void;
+}
 
 function getItem(
   label: React.ReactNode,
@@ -39,14 +50,18 @@ const headerStyle: React.CSSProperties = {
   lineHeight: "64px",
   backgroundColor: "#4096ff",
   fontSize: 20,
+  display: "flex",
+  justifyContent: "space-between", // 将内容分散对齐
+  alignItems: "center", // 垂直居中
 };
 
-const App: React.FC = () => {
+const App: React.FC<AppProps> = ({ user, onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("1"); // 默认选中车辆管理
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+  const navigate = useNavigate(); // 获取 navigate 函数
 
   const handleMenuClick = (e: any) => {
     setSelectedKey(e.key);
@@ -70,7 +85,22 @@ const App: React.FC = () => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Layout>
-        <Header style={headerStyle}>Matrix 车辆租赁管理系统</Header>
+        <Header style={headerStyle}>
+          <span>Matrix 车辆租赁管理系统</span>
+          {user ? (
+            <Button type="primary" icon={<LoginOutlined />} onClick={onLogout}>
+              登出 ({user.username})
+            </Button>
+          ) : (
+            <Button
+              type="primary"
+              icon={<LoginOutlined />}
+              onClick={() => navigate("/login")}
+            >
+              登录
+            </Button>
+          )}
+        </Header>
         <Layout>
           <Sider
             collapsible
