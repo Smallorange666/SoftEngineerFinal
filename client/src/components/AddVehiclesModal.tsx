@@ -1,12 +1,6 @@
 import React from "react";
 import { Modal, Form, Input, InputNumber, message } from "antd";
-import { Vehicle } from "../types.ts";
-
-interface AddVehicleModalProps {
-  visible: boolean; // 控制 Modal 显示
-  onCancel: () => void; // 关闭 Modal
-  onCreate: (values: Omit<Vehicle, "vehicle_id">) => void; // 提交表单
-}
+import type { AddVehicleModalProps } from "../types.ts";
 
 const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
   visible,

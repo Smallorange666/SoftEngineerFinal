@@ -20,6 +20,9 @@ importers:
       crypto-hash:
         specifier: ^3.1.0
         version: 3.1.0
+      dayjs:
+        specifier: ^1.11.13
+        version: 1.11.13
       npm:
         specifier: ^11.0.0
         version: 11.0.0

@@ -1,5 +1,6 @@
 from app import db
-from datetime import datetime
+from datetime import datetime, timezone
+
 
 class Customer(db.Model):
     __tablename__ = 'customers'
@@ -9,8 +10,9 @@ class Customer(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     address = db.Column(db.String(200), nullable=False)
     id_card = db.Column(db.String(18), unique=True, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    updated_at = db.Column(
+        db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     rentals = db.relationship('Rental', backref='customer', lazy=True)
 
@@ -21,4 +23,4 @@ class Customer(db.Model):
             'phone': self.phone,
             'address': self.address,
             'id_card': self.id_card
-        } 
+        }

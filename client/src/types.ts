@@ -1,3 +1,8 @@
+export interface AppProps {
+  user: { id: number; username: string; role: string } | null;
+  onLogout: () => void;
+}
+
 export interface Vehicle {
   vehicle_id: number;
   plate_number: string;
@@ -10,4 +15,20 @@ export interface Vehicle {
 
 export interface VehicleInfo extends Vehicle {
   status: string; // 添加状态字段
+}
+
+export interface VehiclesPageProps {
+  user: { id: number; role: string } | null;
+}
+
+export interface AddVehicleModalProps {
+  visible: boolean; // 控制 Modal 显示
+  onCancel: () => void; // 关闭 Modal
+  onCreate: (values: Omit<Vehicle, "vehicle_id">) => void; // 提交表单
+}
+
+export interface RentalModalProps {
+  open: boolean; // 控制 Modal 显示
+  onCancel: () => void; // 关闭 Modal
+  onRent: (values: { start_time: string; duration_days: number }) => void; // 提交表单
 }

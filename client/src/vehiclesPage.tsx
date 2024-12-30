@@ -5,7 +5,8 @@ import type { FilterDropdownProps } from "antd/es/table/interface";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import AddVehicleModal from "./components/AddVehiclesModal";
-import { Vehicle, VehicleInfo } from "./types";
+import { Vehicle, VehicleInfo, VehiclesPageProps } from "./types";
+import RentalModal from "./components/RentalModal";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -17,7 +18,7 @@ interface TableParams {
   pagination?: TablePaginationConfig;
 }
 
-const VehiclesPage: React.FC = () => {
+const VehiclesPage: React.FC<VehiclesPageProps> = ({ user }) => {
   const [data, setData] = useState<VehicleInfo[]>();
   const [loading, setLoading] = useState(false);
   const [tableParams, setTableParams] = useState<TableParams>({
@@ -28,17 +29,30 @@ const VehiclesPage: React.FC = () => {
   });
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const searchInput = useRef<any>(null);
 
+  const [isAddVehicleModalOpen, setIsAddVehicleModalOpen] = useState(false);
+  const [isRentModalOpen, setIsRentModalOpen] = useState(false);
+  const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(
+    null
+  ); // 记录当前租赁的车辆 ID
+
   // 打开新增车辆浮层
-  const showModal = () => {
-    setIsModalOpen(true);
+  const showAddVehicleModal = () => {
+    setIsAddVehicleModalOpen(true);
   };
 
   // 关闭新增车辆浮层
-  const handleCancel = () => {
-    setIsModalOpen(false);
+  const cancelAddVehicleModal = () => {
+    setIsAddVehicleModalOpen(false);
+  };
+
+  const showRentalModal = () => {
+    setIsRentModalOpen(true);
+  };
+
+  const cancelRentalModal = () => {
+    setIsRentModalOpen(false);
   };
 
   // 搜索逻辑
@@ -198,9 +212,23 @@ const VehiclesPage: React.FC = () => {
       width: "20%",
       render: (_, record) => (
         <Space>
-          <Button type="link" onClick={() => handleDelete(record.vehicle_id)}>
-            删除
-          </Button>
+          {user?.role === "admin" && (
+            <Button type="link" onClick={() => handleDelete(record.vehicle_id)}>
+              删除
+            </Button>
+          )}
+          {/* 普通用户显示“租赁”按钮 */}
+          {user?.role === "user" && (
+            <Button
+              type="link"
+              onClick={() => {
+                showRentalModal();
+                setSelectedVehicleId(record.vehicle_id);
+              }}
+            >
+              租赁
+            </Button>
+          )}
         </Space>
       ),
     },
@@ -249,12 +277,51 @@ const VehiclesPage: React.FC = () => {
         // 创建成功后重新加载数据
         fetchData();
         message.success("车辆创建成功");
-        setIsModalOpen(false); // 关闭 Modal
+        setIsAddVehicleModalOpen(false); // 关闭 Modal
       })
       .catch((error) => {
         // 显示错误提示
         message.error("车辆创建失败：" + error.message);
         console.error("Error creating vehicle:", error);
+      });
+  };
+
+  const handleRent = async (values: {
+    start_time: string;
+    duration_days: number;
+  }) => {
+    console.log(selectedVehicleId, values);
+
+    if (!selectedVehicleId) return; // 如果没有选中车辆，直接返回
+
+    // 调用 API 处理租赁逻辑
+    fetch("http://localhost:5000/api/rentals", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        vehicle_id: selectedVehicleId,
+        customer_id: user?.id,
+        start_time: values.start_time,
+        duration_days: values.duration_days,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((errorData) => {
+            throw new Error(errorData.error);
+          });
+        }
+
+        // 租赁成功后刷新数据
+        fetchData();
+        message.success("租赁成功");
+        setIsRentModalOpen(false); // 关闭 Modal
+      })
+      .catch((error) => {
+        message.error("租赁失败：" + error.message);
+        console.error("Error renting vehicle:", error);
       });
   };
 
@@ -318,14 +385,16 @@ const VehiclesPage: React.FC = () => {
   return (
     <div>
       {/* 新增车辆按钮 */}
-      <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={showModal}
-        style={{ marginBottom: 16 }}
-      >
-        新增车辆
-      </Button>
+      {user?.role === "admin" && (
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={showAddVehicleModal}
+          style={{ marginBottom: 16 }}
+        >
+          新增车辆
+        </Button>
+      )}
 
       {/* 车辆表格 */}
       <Table<VehicleInfo>
@@ -339,9 +408,15 @@ const VehiclesPage: React.FC = () => {
 
       {/* 新增车辆浮层 */}
       <AddVehicleModal
-        visible={isModalOpen}
-        onCancel={handleCancel}
+        visible={isAddVehicleModalOpen}
+        onCancel={cancelAddVehicleModal}
         onCreate={handleCreate}
+      />
+
+      <RentalModal
+        open={isRentModalOpen}
+        onCancel={cancelRentalModal}
+        onRent={handleRent}
       />
     </div>
   );

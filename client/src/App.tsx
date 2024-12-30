@@ -9,15 +9,11 @@ import type { MenuProps } from "antd";
 import { Layout, Menu, theme, Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import VehiclePage from "./VehiclesPage.tsx";
+import { AppProps } from "./types.ts";
 
 const { Header, Content, Footer, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>["items"][number];
-
-interface AppProps {
-  user: { id: number; username: string; role: string } | null;
-  onLogout: () => void;
-}
 
 function getItem(
   label: React.ReactNode,
@@ -85,7 +81,9 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
   const renderContent = () => {
     switch (selectedKey) {
       case "1":
-        return <VehiclePage />;
+        return user ? (
+          <VehiclePage user={{ id: user.id, role: user.role }} />
+        ) : null;
       case "2":
         return user?.role === "admin" ? <div>客户管理页面</div> : null;
       case "3":
