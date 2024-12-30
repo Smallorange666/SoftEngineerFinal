@@ -5,7 +5,7 @@ import type { FilterDropdownProps } from "antd/es/table/interface";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import AddVehicleModal from "./components/AddVehiclesModal";
-import { Vehicle } from "./types";
+import { Vehicle, VehicleInfo } from "./types";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -18,7 +18,7 @@ interface TableParams {
 }
 
 const VehiclesPage: React.FC = () => {
-  const [data, setData] = useState<Vehicle[]>();
+  const [data, setData] = useState<VehicleInfo[]>();
   const [loading, setLoading] = useState(false);
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
@@ -45,7 +45,7 @@ const VehiclesPage: React.FC = () => {
   const handleSearch = (
     selectedKeys: string[],
     confirm: FilterDropdownProps["confirm"],
-    dataIndex: keyof Vehicle
+    dataIndex: keyof VehicleInfo
   ) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -58,8 +58,8 @@ const VehiclesPage: React.FC = () => {
   };
 
   const getColumnSearchProps = (
-    dataIndex: keyof Vehicle
-  ): Exclude<TableProps<Vehicle>["columns"], undefined>[number] => ({
+    dataIndex: keyof VehicleInfo
+  ): Exclude<TableProps<VehicleInfo>["columns"], undefined>[number] => ({
     filterDropdown: ({
       setSelectedKeys,
       selectedKeys,
@@ -144,7 +144,7 @@ const VehiclesPage: React.FC = () => {
   });
 
   // 列定义
-  const columns: ColumnsType<Vehicle> = [
+  const columns: ColumnsType<VehicleInfo> = [
     {
       title: "ID",
       dataIndex: "vehicle_id",
@@ -165,13 +165,13 @@ const VehiclesPage: React.FC = () => {
     {
       title: "品牌",
       dataIndex: "brand",
-      width: "15%",
+      width: "10%",
       ...getColumnSearchProps("brand"),
     },
     {
       title: "型号",
       dataIndex: "model",
-      width: "15%",
+      width: "10%",
       ...getColumnSearchProps("model"),
     },
     {
@@ -183,8 +183,14 @@ const VehiclesPage: React.FC = () => {
     {
       title: "日租金（元）",
       dataIndex: "price_per_day",
-      width: "10%",
+      width: "15%",
       ...getColumnSearchProps("price_per_day"),
+    },
+    {
+      title: "状态",
+      dataIndex: "status",
+      width: "10%",
+      ...getColumnSearchProps("status"),
     },
     {
       title: "操作",
@@ -297,7 +303,9 @@ const VehiclesPage: React.FC = () => {
     fetchData();
   }, [tableParams.pagination?.current, tableParams.pagination?.pageSize]);
 
-  const handleTableChange: TableProps<Vehicle>["onChange"] = (pagination) => {
+  const handleTableChange: TableProps<VehicleInfo>["onChange"] = (
+    pagination
+  ) => {
     setTableParams({
       pagination,
     });
@@ -320,7 +328,7 @@ const VehiclesPage: React.FC = () => {
       </Button>
 
       {/* 车辆表格 */}
-      <Table<Vehicle>
+      <Table<VehicleInfo>
         columns={columns}
         rowKey={(record) => record.vehicle_id.toString()}
         dataSource={data}
