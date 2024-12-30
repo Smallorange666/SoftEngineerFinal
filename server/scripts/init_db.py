@@ -41,7 +41,6 @@ def init_db():
                     model=vehicle["model"],
                     color=vehicle["color"],
                     price_per_day=vehicle["price_per_day"],
-                    status=vehicle["status"],
                     plate_number=vehicle["plate_number"]
                 )
                 for vehicle in vehicles_data

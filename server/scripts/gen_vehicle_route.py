@@ -7,7 +7,6 @@ brands = ["Toyota", "Honda", "Ford", "BMW",
           "Audi", "Tesla", "Nissan", "Volkswagen"]
 models = ["RAV4", "Accord", "Mustang", "X5", "A4", "Model S", "Altima", "Golf"]
 colors = ["白色", "黑色", "红色", "蓝色", "银色", "灰色"]
-statuses = ["可租用", "已租出", "维修中"]
 
 # 生成一辆车的随机数据
 
@@ -19,7 +18,6 @@ def generate_vehicle():
         "model": random.choice(models),
         "color": random.choice(colors),
         "price_per_day": round(random.uniform(100, 500), 2),
-        "status": random.choice(statuses),
         "plate_number": f"京{random.choice(['A', 'B', 'C'])}{random.randint(10000, 99999)}"
     }
 

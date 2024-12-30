@@ -36,7 +36,6 @@
 | model | VARCHAR(50) | 型号 | NOT NULL |
 | color | VARCHAR(20) | 颜色 | NOT NULL |
 | price_per_day | DECIMAL(10,2) | 日租金(元) | NOT NULL |
-| status | VARCHAR(20) | 状态(可租用/已租出/维修中) | NOT NULL |
 | plate_number | VARCHAR(20) | 车牌号 | UNIQUE, NOT NULL |
 | created_at | TIMESTAMP | 创建时间 | DEFAULT NOW() |
 | updated_at | TIMESTAMP | 更新时间 | DEFAULT NOW() |

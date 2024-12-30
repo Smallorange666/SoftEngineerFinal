@@ -22,7 +22,6 @@ interface DataType {
   model: string;
   color: string;
   price_per_day: number;
-  status: string;
 }
 
 interface TableParams {
@@ -160,7 +159,7 @@ const VehiclesPage: React.FC = () => {
     {
       title: "车辆类型",
       dataIndex: "type",
-      width: "15%",
+      width: "10%",
       ...getColumnSearchProps("type"),
     },
     {
@@ -184,19 +183,13 @@ const VehiclesPage: React.FC = () => {
     {
       title: "日租金（元）",
       dataIndex: "price_per_day",
-      width: "15%",
-      ...getColumnSearchProps("price_per_day"),
-    },
-    {
-      title: "状态",
-      dataIndex: "status",
       width: "10%",
-      ...getColumnSearchProps("status"),
+      ...getColumnSearchProps("price_per_day"),
     },
     {
       title: "操作",
       key: "action",
-      width: "10%",
+      width: "20%",
       render: (_, record) => (
         <Space>
           <Button type="link" onClick={() => handleDelete(record.vehicle_id)}>
