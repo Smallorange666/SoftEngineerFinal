@@ -21,13 +21,16 @@ const LoginPage: React.FC<{
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
-  const fetchUsers = async () => {
+  const fetchUser = async (username: string) => {
     try {
-      const response = await fetch("/api/users");
+      const response = await fetch(`/api/user?username=${username}`);
       if (!response.ok) {
         throw new Error("服务器出问题啦，请稍后再试");
       }
       const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message); // 用户不存在
+      }
       return data;
     } catch (error) {
       throw new Error("服务器出问题啦，请稍后再试");
@@ -37,16 +40,8 @@ const LoginPage: React.FC<{
   const onFinish = async (values: { username: string; password: string }) => {
     setLoading(true);
     try {
-      // 拉取用户表
-      const users = await fetchUsers();
-
-      // 查找用户
-      const user = users.find((u: User) => u.username === values.username);
-      if (!user) {
-        message.error("用户不存在");
-        form.setFields([{ name: "username", errors: ["用户不存在"] }]);
-        return;
-      }
+      // 拉取用户信息
+      const user = await fetchUser(values.username);
 
       // 哈希输入的密码
       const passwordHash = await sha256(values.password);
@@ -61,7 +56,12 @@ const LoginPage: React.FC<{
       onLoginSuccess({ id: user.id, username: user.username, role: user.role });
       navigate("/"); // 跳转到主页面
     } catch (error: any) {
-      message.error(error.message); // 提示“服务器出问题啦，请稍后再试”
+      if (error.message === "用户不存在") {
+        message.error("用户不存在");
+        form.setFields([{ name: "username", errors: ["用户不存在"] }]);
+      } else {
+        message.error("服务器出问题啦，请稍后再试");
+      }
     } finally {
       setLoading(false);
     }
