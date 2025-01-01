@@ -91,6 +91,7 @@ def login():
             customer = Customer.query.filter_by(user_id=user.user_id).first()
             if not customer:
                 return jsonify({'error': '未找到关联的客户信息'}), 404
+            customer_id = customer.customer
 
         # 登录成功，返回用户信息和 customer_id
         return jsonify({

@@ -63,7 +63,7 @@ export interface AddCustomerModalProps {
 export interface UpdateProfileModalProps extends User {
   visible: boolean;
   onCancel: () => void;
-  onProfileUpdateSuccess: () => void;
+  onUpdateProfileSuccess: () => void;
 }
 
 export interface CustomerInfo {

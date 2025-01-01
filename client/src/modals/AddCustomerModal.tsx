@@ -40,7 +40,6 @@ const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
 
       setLoading(true);
       await createCustomer(userData); // 调用服务函数
-      message.success("客户创建成功");
       onCreateSuccess(); // 执行创建成功后的回调
       form.resetFields(); // 重置表单
       onCancel(); // 关闭模态框

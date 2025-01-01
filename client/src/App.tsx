@@ -224,7 +224,7 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
         user={user}
         visible={isProfileModalVisible}
         onCancel={() => setIsProfileModalVisible(false)}
-        onProfileUpdateSuccess={() => {
+        onUpdateProfileSuccess={() => {
           setIsProfileModalVisible(false);
           message.success("更新个人信息成功");
         }}
