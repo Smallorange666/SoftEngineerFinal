@@ -32,3 +32,27 @@ export interface RentalModalProps {
   onCancel: () => void; // 关闭 Modal
   onRent: (values: { start_time: string; duration_days: number }) => void; // 提交表单
 }
+
+export interface RentalInfo {
+  rental_id: number;
+  vehicle_id: number;
+  customer_id: number;
+  start_time: string;
+  duration_days: number;
+  expected_return_time: string;
+  actual_return_time: string | null;
+  total_fee: number;
+  status: string;
+  type: string;
+  brand: string;
+  model: string;
+  color: string;
+  price_per_day: number;
+}
+
+export interface MyRentalsPageProps {
+  user: {
+    user_id: number;
+    role: string;
+  };
+}

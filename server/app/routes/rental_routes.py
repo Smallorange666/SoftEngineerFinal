@@ -3,6 +3,7 @@ from app.routes import bp
 from app.models import Rental, Vehicle, Customer
 from app import db
 from datetime import datetime, timedelta
+from sqlalchemy.orm import joinedload
 
 # 定义有效的租赁状态
 VALID_RENTAL_STATUS = ['进行中', '已完成', '已取消']
@@ -20,12 +21,46 @@ def get_rental(id):
     return jsonify(rental.to_dict())
 
 
-@bp.route('/api/rentals/customer/<int:customer_id>', methods=['GET'])
-def get_customer_rentals(customer_id):
+# 获取某个用户的所有租赁记录，只有在用户自己登录时才能访问，所以用user_id
+@bp.route('/api/rentals/customer/<int:user_id>', methods=['GET'])
+def get_customer_rentals(user_id):
     # 验证客户是否存在
-    customer = Customer.query.get_or_404(customer_id)
-    rentals = Rental.query.filter_by(customer_id=customer_id).all()
-    return jsonify([rental.to_dict() for rental in rentals])
+    try:
+        customer = Customer.query.filter_by(user_id=user_id).one()
+    except:
+        return jsonify({'error': 'Customer not found'}), 404
+
+    # 联表查询租赁历史和车辆信息
+    rentals = (
+        Rental.query
+        .filter_by(customer_id=customer.customer_id)
+        .join(Vehicle)  # 联表查询车辆信息
+        .all()
+    )
+
+    # 构造返回数据，将车辆信息平铺到租赁信息中
+    result = []
+    for rental in rentals:
+        rental_dict = {
+            'rental_id': rental.rental_id,
+            'vehicle_id': rental.vehicle_id,
+            'customer_id': rental.customer_id,
+            'start_time': rental.start_time.strftime('%Y-%m-%d %H:%M'),
+            'duration_days': rental.duration_days,
+            'expected_return_time': rental.expected_return_time.strftime('%Y-%m-%d %H:%M'),
+            'actual_return_time': rental.actual_return_time.strftime('%Y-%m-%d %H:%M') if rental.actual_return_time else None,
+            'total_fee': float(rental.total_fee),
+            'status': rental.status,
+            'plate_number': rental.vehicle.plate_number,
+            'type': rental.vehicle.type,
+            'brand': rental.vehicle.brand,
+            'model': rental.vehicle.model,
+            'color': rental.vehicle.color,
+            'price_per_day': float(rental.vehicle.price_per_day)
+        }
+        result.append(rental_dict)
+
+    return jsonify(result)
 
 
 @bp.route('/api/rentals', methods=['POST'])

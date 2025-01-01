@@ -9,6 +9,7 @@ import type { MenuProps } from "antd";
 import { Layout, Menu, theme, Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import VehiclePage from "./VehiclesPage.tsx";
+import MyRentalPage from "./MyRentalPage.tsx";
 import { AppProps } from "./types.ts";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -29,7 +30,11 @@ function getItem(
   } as MenuItem;
 }
 
-const customerMenuItems: MenuItem[] = [getItem("车辆清单", "1", <CarOutlined />)];
+const customerMenuItems: MenuItem[] = [
+  getItem("车辆清单", "1", <CarOutlined />),
+  getItem("我的租赁", "2", <AuditOutlined />),
+  getItem("个人信息", "3", <UserOutlined />),
+];
 
 // 管理员专属菜单项配置
 const adminMenuItems: MenuItem[] = [
@@ -81,11 +86,15 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
   const renderContent = () => {
     switch (selectedKey) {
       case "1":
-        return user ? (
-          <VehiclePage user={{ user_id: user.user_id, role: user.role }} />
-        ) : null;
+        if (user) {
+          return <VehiclePage user={user} />;
+        } else return null;
       case "2":
-        return user?.role === "admin" ? <div>客户管理页面</div> : null;
+        if (user) {
+          return user.role === "admin" ? null : (
+            <MyRentalPage user={{ user_id: user.user_id, role: user.role }} />
+          );
+        } else return null;
       case "3":
         return user?.role === "admin" ? <div>进行中的租赁</div> : null;
       case "4":
