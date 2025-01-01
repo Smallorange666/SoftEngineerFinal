@@ -7,6 +7,14 @@ import Highlighter from "react-highlight-words";
 import AddVehicleModal from "../modals/AddVehiclesModal";
 import { Vehicle, VehicleInfo, User } from "../types";
 import RentalModal from "../modals/RentalModal";
+import {
+  fetchAllVehicles,
+  deleteVehicle,
+  createVehicle,
+  rentVehicle,
+} from "../services/vehicleServices.tsx"; // 导入服务函数
+
+import { fetchCustomerById } from "../services/customerServices.tsx";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -20,7 +28,7 @@ interface TableParams {
 
 const VehiclesPage: React.FC<User> = ({ user }) => {
   const [data, setData] = useState<VehicleInfo[]>([]);
-  const [filteredData, setFilteredData] = useState<VehicleInfo[]>([]); // 筛选后的数据
+  const [filteredData, setFilteredData] = useState<VehicleInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
@@ -260,140 +268,70 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
   ];
 
   // 删除操作
-  const handleDelete = (vehicleId: number) => {
-    // 调用 API 删除车辆
-    fetch(`http://localhost:5000/api/vehicles/${vehicleId}`, {
-      method: "DELETE",
-    })
-      .then((res) => {
-        if (!res.ok) {
-          return res.json().then((errorData) => {
-            throw new Error(errorData.error);
-          });
-        }
-        fetchData();
-        message.success("车辆删除成功");
-      })
-      .catch((error) => {
-        message.error("车辆删除失败：" + error.message);
-        console.error("Error deleting vehicle:", error);
-      });
+  const handleDelete = async (vehicle_id: number) => {
+    try {
+      await deleteVehicle(vehicle_id); // 调用服务函数
+      fetchData(); // 重新加载数据
+    } catch (error) {
+      console.error("Error deleting vehicle:", error);
+    }
   };
 
+  // 创建车辆
   const handleCreate = async (values: Omit<Vehicle, "vehicle_id">) => {
-    // 调用 API 创建车辆
-    fetch("http://localhost:5000/api/vehicles", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          return res.json().then((errorData) => {
-            throw new Error(errorData.error);
-          });
-        }
-        fetchData();
-        message.success("车辆创建成功");
-        setIsAddVehicleModalOpen(false);
-      })
-      .catch((error) => {
-        message.error("车辆创建失败：" + error.message);
-        console.error("Error creating vehicle:", error);
-      });
+    try {
+      await createVehicle(values); // 调用服务函数
+      fetchData(); // 重新加载数据
+      setIsAddVehicleModalOpen(false); // 关闭 Modal
+    } catch (error) {
+      console.error("Error creating vehicle:", error);
+    }
   };
 
+  // 租赁车辆
   const handleRent = async (values: {
     start_time: string;
     duration_days: number;
   }) => {
-    console.log(selectedVehicleId, values);
-
-    if (!selectedVehicleId) {
-      message.error("未选择车辆，无法租赁");
+    if (!selectedVehicleId || !user) {
+      message.error("未选择车辆或用户未登录，无法租赁");
       return;
     }
 
     try {
-      if (!user) {
-        message.error("用户未登录，无法租赁");
-        return;
-      }
-
-      const customerResponse = await fetch(
-        `http://localhost:5000/api/customers/${user.user_id}`
-      );
-      if (!customerResponse.ok) {
-        const errorData = await customerResponse.json();
-        throw new Error(errorData.error || "无法获取客户信息");
-      }
-
-      const customerData = await customerResponse.json();
-      const customerId = customerData.customer_id;
+      const customerInfo = await fetchCustomerById(user.user_id); // 获取客户信息
+      const customerId = customerInfo.customer_id;
 
       if (!customerId) {
         throw new Error("未找到对应的客户信息");
       }
 
-      const rentalResponse = await fetch("http://localhost:5000/api/rentals", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          vehicle_id: selectedVehicleId,
-          customer_id: customerId,
-          start_time: values.start_time,
-          duration_days: values.duration_days,
-        }),
-      });
-
-      if (!rentalResponse.ok) {
-        const errorData = await rentalResponse.json();
-        throw new Error(errorData.error || "租赁失败");
-      }
-
-      fetchData();
-      message.success("租赁成功");
-      setIsRentModalOpen(false);
-    } catch (error: any) {
-      message.error("租赁失败：" + error.message);
+      await rentVehicle(selectedVehicleId, customerId, values); // 调用服务函数
+      fetchData(); // 重新加载数据
+      setIsRentModalOpen(false); // 关闭 Modal
+    } catch (error) {
       console.error("Error renting vehicle:", error);
     }
   };
 
   // 获取数据
-  const fetchData = () => {
+  const fetchData = async () => {
     setLoading(true);
-    fetch("http://localhost:5000/api/vehicles")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return res.json();
-      })
-      .then((response) => {
-        if (Array.isArray(response.data)) {
-          setData(response.data);
-          setFilteredData(response.data); // 初始化筛选数据
-          setLoading(false);
-          setTableParams({
-            pagination: {
-              ...tableParams.pagination,
-              total: response.data.length, // 更新总数
-            },
-          });
-        } else {
-          throw new Error("Invalid data format: expected an array");
-        }
-      })
-      .catch((error) => {
-        message.error("获取数据失败，请稍后再试");
-        console.error("Error fetching data:", error);
-        setLoading(false);
+    try {
+      const vehicles = await fetchAllVehicles(); // 调用服务函数
+      setData(vehicles);
+      setFilteredData(vehicles); // 初始化筛选数据
+      setLoading(false);
+      setTableParams({
+        pagination: {
+          ...tableParams.pagination,
+          total: vehicles.length, // 更新总数
+        },
       });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

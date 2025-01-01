@@ -1,11 +1,16 @@
 import React, { useEffect, useState, useRef } from "react";
 import type { GetProp, TableProps } from "antd";
-import { Table, Input, Button, Space, message } from "antd";
+import { Table, Input, Button, Space } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { User, CustomerInfo, CreateCustomerInfo } from "../types";
 import AddCustomerModal from "../modals/AddCustomerModal";
+import {
+  fetchAllCustomers,
+  deleteCustomer,
+  createCustomer,
+} from "../services/customerServices"; // 导入服务函数
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -19,7 +24,7 @@ interface TableParams {
 
 const CustomerPage: React.FC<User> = ({ user }) => {
   const [data, setData] = useState<CustomerInfo[]>([]);
-  const [filteredData, setFilteredData] = useState<CustomerInfo[]>([]); // 筛选后的数据
+  const [filteredData, setFilteredData] = useState<CustomerInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
@@ -222,82 +227,46 @@ const CustomerPage: React.FC<User> = ({ user }) => {
   ];
 
   // 删除操作
-  const handleDelete = (customer_id: number) => {
-    // 调用 API 删除车辆
-    fetch(`http://localhost:5000/api/customers/${customer_id}`, {
-      method: "DELETE",
-    })
-      .then((res) => {
-        if (!res.ok) {
-          return res.json().then((errorData) => {
-            throw new Error(errorData.error);
-          });
-        }
-        fetchData();
-        message.success("用户删除成功");
-      })
-      .catch((error) => {
-        message.error("用户删除失败：" + error.message);
-      });
+  const handleDelete = async (customerId: number) => {
+    try {
+      await deleteCustomer(customerId); // 调用服务函数
+      fetchData(); // 重新加载数据
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+    }
   };
 
+  // 创建客户
   const handleCreate = async (
     values: Omit<CreateCustomerInfo, "customer_id">
   ) => {
-    // 调用 API 创建车辆
-    fetch("http://localhost:5000/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          return res.json().then((errorData) => {
-            throw new Error(errorData.error);
-          });
-        }
-        fetchData();
-        message.success("客户创建成功");
-        setIsAddCustomerModalOpen(false);
-      })
-      .catch((error) => {
-        message.error("客户创建失败：" + error.message);
-        console.error("Error creating vehicle:", error);
-      });
+    try {
+      await createCustomer(values); // 调用服务函数
+      fetchData(); // 重新加载数据
+      setIsAddCustomerModalOpen(false); // 关闭 Modal
+    } catch (error) {
+      console.error("Error creating customer:", error);
+    }
   };
 
   // 获取数据
-  const fetchData = () => {
+  const fetchData = async () => {
     setLoading(true);
-    fetch("http://localhost:5000/api/customers")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return res.json();
-      })
-      .then((response) => {
-        if (Array.isArray(response.data)) {
-          setData(response.data);
-          setFilteredData(response.data); // 初始化筛选数据
-          setLoading(false);
-          setTableParams({
-            pagination: {
-              ...tableParams.pagination,
-              total: response.data.length, // 更新总数
-            },
-          });
-        } else {
-          throw new Error("Invalid data format: expected an array");
-        }
-      })
-      .catch((error) => {
-        message.error("获取数据失败，请稍后再试");
-        console.error("Error fetching data:", error);
-        setLoading(false);
+    try {
+      const customers = await fetchAllCustomers(); // 调用服务函数
+      setData(customers);
+      setFilteredData(customers); // 初始化筛选数据
+      setLoading(false);
+      setTableParams({
+        pagination: {
+          ...tableParams.pagination,
+          total: customers.length, // 更新总数
+        },
       });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
