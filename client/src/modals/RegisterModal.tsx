@@ -21,6 +21,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
     confirmPassword: string;
     name: string;
     phone: string;
+    address: string;
     idCard: string;
   }) => {
     // 校验密码和确认密码是否一致
@@ -127,6 +128,15 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
           ]}
         >
           <Input placeholder="手机号" />
+        </Form.Item>
+        <Form.Item
+          name="address"
+          rules={[
+            { required: false, message: "请输入地址" },
+            { max: 200, message: "地址最多 200 个字符" },
+          ]}
+        >
+          <Input placeholder="地址" />
         </Form.Item>
         <Form.Item
           name="idCard"

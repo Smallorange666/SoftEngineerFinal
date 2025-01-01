@@ -42,10 +42,6 @@ def register():
     if User.query.filter_by(username=data['username']).first():
         return jsonify({'error': 'Username already exists'}), 400
 
-    # 检查身份证号是否已存在
-    if Customer.query.filter_by(id_card=data['id_card']).first():
-        return jsonify({'error': 'ID card already exists'}), 400
-
     try:
         # 创建用户
         password_hash = generate_password_hash(data['password'])
@@ -62,6 +58,7 @@ def register():
             user_id=user.user_id,
             name=data['name'],
             phone=data['phone'],
+            address=data['address'] if 'address' in data else None,
             id_card=data['id_card']
         )
         db.session.add(customer)

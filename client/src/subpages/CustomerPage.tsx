@@ -233,7 +233,7 @@ const CustomerPage: React.FC<User> = ({ user }) => {
     values: Omit<CreateCustomerInfo, "customer_id">
   ) => {
     // 调用 API 创建车辆
-    fetch("http://localhost:5000/api/customers", {
+    fetch("http://localhost:5000/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

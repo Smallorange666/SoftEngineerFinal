@@ -56,30 +56,43 @@ const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
         <Form.Item
           name="name"
           label="姓名"
-          rules={[{ required: true, message: "请输入姓名" }]}
+          rules={[
+            { required: true, message: "请输入姓名" },
+            { min: 1, message: "姓名至少 1 个字符" },
+            { max: 50, message: "姓名最多 50 个字符" },
+          ]}
         >
-          <Input />
+          <Input placeholder="请输入姓名" />
         </Form.Item>
         <Form.Item
           name="phone"
           label="手机号"
-          rules={[{ required: true, message: "请输入手机号" }]}
+          rules={[
+            { required: true, message: "请输入手机号" },
+            { pattern: /^\d{11}$/, message: "手机号格式不正确" },
+          ]}
         >
-          <Input />
+          <Input placeholder="请输入手机号" />
         </Form.Item>
         <Form.Item
           name="address"
           label="地址"
-          rules={[{ required: false, message: "请输入地址" }]}
+          rules={[
+            { required: false, message: "请输入地址" },
+            { max: 200, message: "地址最多 200 个字符" },
+          ]}
         >
-          <Input />
+          <Input placeholder="请输入地址" />
         </Form.Item>
         <Form.Item
           name="id_card"
           label="身份证号"
-          rules={[{ required: true, message: "请输入身份证号" }]}
+          rules={[
+            { required: true, message: "请输入身份证号" },
+            { pattern: /^\d{17}[\dXx]$/, message: "身份证号格式不正确" },
+          ]}
         >
-          <Input />
+          <Input placeholder="请输入身份证号" />
         </Form.Item>
       </Form>
     </Modal>
