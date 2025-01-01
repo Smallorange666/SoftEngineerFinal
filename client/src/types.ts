@@ -85,3 +85,9 @@ export interface ModifyAccountModalProps extends User {
   onCancel: () => void; // 关闭模态框的回调
   onModifySuccess: () => void; // 修改成功的回调
 }
+
+export interface DeleteAccountModalProps extends User {
+  visible: boolean; // 控制模态框显示/隐藏
+  onCancel: () => void; // 关闭模态框的回调s
+  onDeleteAccountSuccess: () => void; // 注销账号的回调
+}

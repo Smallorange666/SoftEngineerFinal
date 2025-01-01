@@ -18,6 +18,7 @@ import ProfileModal from "./modals/ProfileModal.tsx"; // 引入 ProfileModal
 import { AppProps } from "./types.ts";
 import CustomerPage from "./subpages/CustomerPage.tsx";
 import ModifyAccountModal from "./modals/ModifyAccountModal.tsx";
+import DeleteAccountModal from "./modals/DeleteAccountModal.tsx";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -84,6 +85,8 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
   const [isProfileModalVisible, setIsProfileModalVisible] = useState(false); // 控制 ProfileModal 显示/隐藏
   const [isModifyAccountModalVisible, setIsModifyAccountModalVisible] =
     useState(false); // 控制 ModifyAccountModal 显示/隐藏
+  const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] =
+    useState(false); // 控制 DeleteAccountModal 显示/隐藏s
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -122,16 +125,14 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
           icon: <SettingOutlined />,
           onClick: () => setIsProfileModalVisible(true),
         },
+        commonItems[0],
         {
           key: "delete-account",
           label: "注销账号",
           icon: <DeleteOutlined />,
-          onClick: () => {
-            message.info("注销账号");
-            // 调用注销账号的 API
-          },
+          onClick: () => setIsDeleteAccountModalVisible(true),
         },
-        ...commonItems,
+        commonItems[1],
       ];
     } else if (role === "admin") {
       return commonItems;
@@ -238,6 +239,19 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
           onLogout();
           navigate("/login");
           message.info("修改成功，请重新登录");
+        }}
+      />
+
+      {/* DeleteAccountModal */}
+      <DeleteAccountModal
+        user={user}
+        visible={isDeleteAccountModalVisible}
+        onCancel={() => setIsDeleteAccountModalVisible(false)}
+        onDeleteAccountSuccess={() => {
+          setIsDeleteAccountModalVisible(false);
+          onLogout();
+          navigate("/login");
+          message.info("账号已注销");
         }}
       />
     </Layout>

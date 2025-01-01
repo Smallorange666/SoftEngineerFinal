@@ -2,7 +2,7 @@ from werkzeug.security import check_password_hash
 from flask import request, jsonify
 from flask import jsonify, request
 from app.routes import bp
-from app.models import User, Customer
+from app.models import Users, Customer
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -26,13 +26,13 @@ def register():
         return jsonify({'error': 'Invalid ID card format'}), 400
 
     # 检查用户名是否已存在
-    if User.query.filter_by(username=data['username']).first():
+    if Users.query.filter_by(username=data['username']).first():
         return jsonify({'error': 'Username already exists'}), 400
 
     try:
         # 创建用户
         password_hash = generate_password_hash(data['password'])
-        user = User(
+        user = Users(
             username=data['username'],
             password_hash=password_hash,
             role='customer'  # 默认角色为 customer
@@ -77,9 +77,12 @@ def login():
 
     try:
         # 查找用户
-        user = User.query.filter_by(username=data['username']).first()
+        user = Users.query.filter_by(username=data['username']).first()
         if not user:
             return jsonify({'error': '用户名或密码错误'}), 401
+
+        if user.is_deleted:
+            return jsonify({'error': 'User not found'}), 404
 
         # 验证密码
         if not check_password_hash(user.password_hash, data['password']):
@@ -91,7 +94,7 @@ def login():
             customer = Customer.query.filter_by(user_id=user.user_id).first()
             if not customer:
                 return jsonify({'error': '未找到关联的客户信息'}), 404
-            customer_id = customer.customer
+            customer_id = customer.customer_id
 
         # 登录成功，返回用户信息和 customer_id
         return jsonify({
@@ -108,7 +111,7 @@ def login():
 
 @bp.route('/api/user/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
-    user = User.query.get(user_id)
+    user = Users.query.get(user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
@@ -120,6 +123,27 @@ def update_user(user_id):
         password_hash = generate_password_hash(data['password'])
         user.password_hash = password_hash
 
+        db.session.commit()
+        return '', 204
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
+
+
+@bp.route('/api/user/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    user = Users.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    if not check_password_hash(user.password_hash, request.get_json()['password']):
+        return jsonify({'error': 'Password incorrect'}), 400
+
+    customer = Customer.query.filter_by(user_id=user_id).first()
+
+    try:
+        user.is_deleted = True
+        customer.is_deleted = True
         db.session.commit()
         return '', 204
     except Exception as e:
