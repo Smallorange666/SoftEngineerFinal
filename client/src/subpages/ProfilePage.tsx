@@ -32,7 +32,7 @@ const ProfilePage: React.FC<User> = ({ user }) => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:5000/api/customers/?user_id=${user.user_id}`,
+        `http://localhost:5000/api/customers/${user.customer_id}`,
         {
           method: "PUT",
           headers: {

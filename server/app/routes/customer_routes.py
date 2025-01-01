@@ -53,9 +53,9 @@ def create_customer():
         return jsonify({'error': str(e)}), 400
 
 
-@bp.route('/api/customers/<int:id>', methods=['PUT'])
-def update_customer(id):
-    customer = Customer.query.get_or_404(id)
+@bp.route('/api/customers/<int:customer_id>', methods=['PUT'])
+def update_customer(customer_id):
+    customer = Customer.query.get_or_404(customer_id)
     data = request.get_json()
 
     try:
