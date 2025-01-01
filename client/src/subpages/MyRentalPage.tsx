@@ -13,7 +13,7 @@ const MyRentalsPage: React.FC<User> = ({ user }) => {
     setLoading(true);
     try {
       const rentalsResponse = await fetch(
-        `http://localhost:5000/api/rentals/customer/${user.user_id}`
+        `http://localhost:5000/api/rentals/customer/${user.customer_id}`
       );
       if (!rentalsResponse.ok) {
         const errorData = await rentalsResponse.json();

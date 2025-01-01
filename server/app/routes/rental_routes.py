@@ -50,15 +50,14 @@ def get_rental(id):
     return jsonify(rental.to_dict())
 
 
-@bp.route('/api/rentals/customer/<int:user_id>', methods=['GET'])
-def get_customer_rentals(user_id):
+@bp.route('/api/rentals/customer/<int:customer_id>', methods=['GET'])
+def get_customer_rentals(customer_id):
     # 检查并更新租赁状态
     check_and_update_rental_status()
 
     # 验证客户是否存在
-    try:
-        customer = Customer.query.filter_by(user_id=user_id).one()
-    except:
+    customer = Customer.query.get(customer_id)
+    if (customer is None):
         return jsonify({'error': 'Customer not found'}), 404
 
     # 联表查询租赁历史和车辆信息

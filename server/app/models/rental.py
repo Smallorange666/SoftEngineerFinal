@@ -10,7 +10,7 @@ class Rental(db.Model):
     start_time = db.Column(db.DateTime, nullable=False)
     duration_days = db.Column(db.Integer, nullable=False)
     expected_return_time = db.Column(db.DateTime, nullable=False)
-    actual_return_time = db.Column(db.DateTime)
+    actual_return_time = db.Column(db.DateTime, nullable=True)
     total_fee = db.Column(db.Numeric(10, 2), nullable=False)
     status = db.Column(db.String(20), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

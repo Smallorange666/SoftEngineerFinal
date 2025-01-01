@@ -88,7 +88,7 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
   const renderContent = () => {
     switch (selectedKey) {
       case "1":
-        return user.role === "admin" ? <VehiclePage user={user} /> : null;
+        return <VehiclePage user={user} />;
       case "2":
         return user.role === "admin" ? null : <MyRentalPage user={user} />;
       case "3":

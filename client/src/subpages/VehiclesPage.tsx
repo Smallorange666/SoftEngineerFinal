@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import type { GetProp, TableProps } from "antd";
-import { Table, Input, Button, Space, message } from "antd";
+import { Table, Input, Button, Space, message, Tag } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
@@ -218,7 +218,7 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
             </Button>
           )}
           {/* 普通用户显示“租赁”按钮 */}
-          {user?.role === "customer" && (
+          {user?.role === "customer" && record.status === "可租用" && (
             <Button
               type="link"
               onClick={() => {

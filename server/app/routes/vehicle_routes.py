@@ -1,3 +1,4 @@
+from flask import request, jsonify
 from flask import jsonify, request
 from sqlalchemy import func
 from app.routes import bp
@@ -19,18 +20,9 @@ def get_vehicles_info():
     vehicles = (
         db.session.query(
             Vehicle,
-            func.coalesce(
-                db.session.query(Rental.status)
-                .filter(
-                    Rental.vehicle_id == Vehicle.vehicle_id,
-                    Rental.status == '进行中'
-                )
-                .order_by(Rental.start_time.desc())
-                .limit(1)
-                .as_scalar(),
-                '可租用'
-            ).label('status')
+            Rental.status
         )
+        .join(Rental, Vehicle.vehicle_id == Rental.vehicle_id, isouter=True)
         .paginate(page=page, per_page=page_size, error_out=False)
     )
 
@@ -39,7 +31,7 @@ def get_vehicles_info():
         'data': [
             {
                 **vehicle.to_dict(),
-                'status': status  # 添加车辆状态
+                'status': '忙碌中' if status == '进行中' or status == '已逾期' else '可租用'
             }
             for vehicle, status in vehicles.items
         ],

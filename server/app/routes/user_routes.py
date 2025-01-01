@@ -1,6 +1,4 @@
 from werkzeug.security import check_password_hash
-from .models import User, Customer
-from . import db
 from flask import request, jsonify
 from flask import jsonify, request
 from app.routes import bp
@@ -110,10 +108,12 @@ def login():
 
         # 登录成功，返回用户信息和 customer_id
         return jsonify({
-            'user_id': user.user_id,
-            'username': user.username,
-            'role': user.role,
-            'customer_id': customer.customer_id
+            'user': {
+                'user_id': user.user_id,
+                'username': user.username,
+                'role': user.role,
+                'customer_id': customer.customer_id,
+            }
         }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
