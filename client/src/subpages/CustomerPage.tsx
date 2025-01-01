@@ -4,12 +4,11 @@ import { Table, Input, Button, Space } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import { User, CustomerInfo, CreateCustomerInfo } from "../types";
+import { User, CustomerInfo } from "../types";
 import AddCustomerModal from "../modals/AddCustomerModal";
 import {
   fetchAllCustomers,
   deleteCustomer,
-  createCustomer,
 } from "../services/customerServices"; // 导入服务函数
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
@@ -236,19 +235,6 @@ const CustomerPage: React.FC<User> = ({ user }) => {
     }
   };
 
-  // 创建客户
-  const handleCreate = async (
-    values: Omit<CreateCustomerInfo, "customer_id">
-  ) => {
-    try {
-      await createCustomer(values); // 调用服务函数
-      fetchData(); // 重新加载数据
-      setIsAddCustomerModalOpen(false); // 关闭 Modal
-    } catch (error) {
-      console.error("Error creating customer:", error);
-    }
-  };
-
   // 获取数据
   const fetchData = async () => {
     setLoading(true);
@@ -306,7 +292,7 @@ const CustomerPage: React.FC<User> = ({ user }) => {
       <AddCustomerModal
         visible={isAddCustomerModalOpen}
         onCancel={cancelAddCustomerModal}
-        onCreate={handleCreate}
+        onCreateSuccess={fetchData} // 创建成功后重新加载数据
       />
     </div>
   );

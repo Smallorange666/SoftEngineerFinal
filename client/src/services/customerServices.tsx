@@ -71,3 +71,24 @@ export const createCustomer = async (values: any) => {
     throw error;
   }
 };
+
+// 更新客户信息
+export const updateCustomer = async (customer_id: number, values: any) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/customers/${customer_id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "更新客户信息失败");
+    }
+    message.success("客户信息更新成功");
+  } catch (error: any) {
+    message.error("更新客户信息失败：" + error.message);
+    throw error;
+  }
+};

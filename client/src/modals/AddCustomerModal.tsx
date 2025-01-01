@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { Modal, Form, Input, message } from "antd";
 import type { AddCustomerModalProps } from "../types";
+import { createCustomer } from "../services/customerServices"; // 导入服务函数
 
 const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
   visible,
   onCancel,
-  onCreate,
+  onCreateSuccess,
 }) => {
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   // 生成8位随机字符串
   const generateRandomString = () => {
@@ -20,6 +22,7 @@ const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
     return result;
   };
 
+  // 提交表单
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
@@ -35,11 +38,17 @@ const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
         role,
       };
 
-      onCreate(userData); // 调用父组件传递的 onCreate 方法
+      setLoading(true);
+      await createCustomer(userData); // 调用服务函数
+      message.success("客户创建成功");
+      onCreateSuccess(); // 执行创建成功后的回调
       form.resetFields(); // 重置表单
+      onCancel(); // 关闭模态框
     } catch (error) {
-      message.error("表单验证失败，请检查输入");
-      console.error("Form validation failed:", error);
+      message.error("客户创建失败");
+      console.error("Error creating customer:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,6 +60,7 @@ const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
       onCancel={onCancel}
       okText="创建"
       cancelText="取消"
+      confirmLoading={loading}
     >
       <Form form={form} layout="vertical">
         <Form.Item

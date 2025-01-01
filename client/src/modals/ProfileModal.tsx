@@ -1,25 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, message } from "antd";
-import type { User } from "../types";
+import { Modal, Form, Input, message } from "antd";
+import type { UpdateProfileModalProps } from "../types";
+import {
+  fetchCustomerById,
+  updateCustomer,
+} from "../services/customerServices"; // 导入服务函数
 
-const ProfilePage: React.FC<User> = ({ user }) => {
+const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
+  user,
+  visible,
+  onCancel,
+  onUpdateProfileSuccess,
+}) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
   // 获取用户信息
-  const fetchProfile = async () => {
+  const fillProfile = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/customers/${user.user_id}`
-      );
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "无法获取用户信息");
-      }
-
-      const profileData = await response.json();
-      form.setFieldsValue(profileData); // 将数据填充到表单中
+      fetchCustomerById(user.customer_id).then((data) => {
+        form.setFieldsValue(data);
+      });
     } catch (error: any) {
       message.error("获取用户信息失败：" + error.message);
     } finally {
@@ -31,23 +33,10 @@ const ProfilePage: React.FC<User> = ({ user }) => {
   const handleSubmit = async (values: any) => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/customers/${user.customer_id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "更新失败");
-      }
-
+      await updateCustomer(user.customer_id, values); // 调用服务函数
       message.success("个人信息更新成功");
+      onCancel(); // 关闭模态框
+      onUpdateProfileSuccess(); // 调用父组件传递的回调函数
     } catch (error: any) {
       message.error("更新失败：" + error.message);
     } finally {
@@ -56,14 +45,21 @@ const ProfilePage: React.FC<User> = ({ user }) => {
   };
 
   useEffect(() => {
-    if (user?.user_id) {
-      fetchProfile();
+    if (visible && user?.user_id) {
+      fillProfile();
     }
-  }, [user?.user_id]);
+  }, [visible, user?.user_id]);
 
   return (
-    <div>
-      <h2>个人信息</h2>
+    <Modal
+      title="更改信息"
+      open={visible}
+      onCancel={onCancel}
+      onOk={() => form.submit()}
+      okText="提交"
+      cancelText="取消"
+      confirmLoading={loading}
+    >
       <Form form={form} onFinish={handleSubmit} layout="vertical">
         <Form.Item
           name="name"
@@ -95,14 +91,9 @@ const ProfilePage: React.FC<User> = ({ user }) => {
         <Form.Item name="address" label="地址">
           <Input placeholder="请输入地址" />
         </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading}>
-            提交
-          </Button>
-        </Form.Item>
       </Form>
-    </div>
+    </Modal>
   );
 };
 
-export default ProfilePage;
+export default UpdateProfileModal;

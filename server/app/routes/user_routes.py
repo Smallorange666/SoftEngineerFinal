@@ -7,19 +7,6 @@ from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-@bp.route('/api/user', methods=['GET'])
-def get_user():
-    username = request.args.get('username')
-    if not username:
-        return jsonify({'error': '缺少username参数'}), 400
-
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        return jsonify({}), 200
-
-    return jsonify(user.to_dict()), 200
-
-
 @bp.route('/api/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -116,3 +103,24 @@ def login():
         }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@bp.route('/api/user/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    data = request.get_json()
+
+    try:
+        data = request.get_json()
+        user.username = data['username']
+        password_hash = generate_password_hash(data['password'])
+        user.password_hash = password_hash
+
+        db.session.commit()
+        return '', 204
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400

@@ -74,8 +74,9 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
       cancelText="取消"
       confirmLoading={loading}
     >
-      <Form form={form} onFinish={handleRegister}>
+      <Form form={form} onFinish={handleRegister} layout="vertical">
         <Form.Item
+          label="用户名"
           name="username"
           rules={[
             { required: true, message: "请输入用户名" },
@@ -86,6 +87,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
           <Input placeholder="用户名" />
         </Form.Item>
         <Form.Item
+          label="密码"
           name="password"
           rules={[
             { required: true, message: "请输入密码" },
@@ -95,6 +97,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
           <Input.Password placeholder="密码" />
         </Form.Item>
         <Form.Item
+          label="确认密码"
           name="confirmPassword"
           rules={[
             { required: true, message: "请确认密码" },
@@ -111,6 +114,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
           <Input.Password placeholder="确认密码" />
         </Form.Item>
         <Form.Item
+          label="姓名"
           name="name"
           rules={[
             { required: true, message: "请输入姓名" },
@@ -121,6 +125,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
           <Input placeholder="姓名" />
         </Form.Item>
         <Form.Item
+          label="手机号"
           name="phone"
           rules={[
             { required: true, message: "请输入手机号" },
@@ -130,6 +135,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
           <Input placeholder="手机号" />
         </Form.Item>
         <Form.Item
+          label="地址"
           name="address"
           rules={[
             { required: false, message: "请输入地址" },
@@ -139,6 +145,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
           <Input placeholder="地址" />
         </Form.Item>
         <Form.Item
+          label="身份证号"
           name="idCard"
           rules={[
             { required: true, message: "请输入身份证号" },

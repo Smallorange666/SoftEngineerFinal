@@ -57,7 +57,13 @@ export interface RentalInfo {
 export interface AddCustomerModalProps {
   visible: boolean; // 控制模态框显示
   onCancel: () => void; // 取消按钮回调
-  onCreate: (values: any) => void; // 创建按钮回调
+  onCreateSuccess: () => void; // 创建成功回调
+}
+
+export interface UpdateProfileModalProps extends User {
+  visible: boolean;
+  onCancel: () => void;
+  onProfileUpdateSuccess: () => void;
 }
 
 export interface CustomerInfo {
@@ -72,4 +78,10 @@ export interface CustomerInfo {
 export interface CreateCustomerInfo extends CustomerInfo {
   password: string;
   role: string;
+}
+
+export interface ModifyAccountModalProps extends User {
+  visible: boolean; // 控制模态框显示/隐藏
+  onCancel: () => void; // 关闭模态框的回调
+  onModifySuccess: () => void; // 修改成功的回调
 }
