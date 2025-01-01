@@ -30,6 +30,15 @@ def get_customers():
     return jsonify(result)
 
 
+@bp.route('/api/customers/<int:customer_id>', methods=['GET'])
+def get_customer_by_id(customer_id):
+    customer = Customer.query.get(customer_id)
+    if not customer:
+        return jsonify({'error': 'Customer not found'}), 404
+
+    return jsonify(customer.to_dict())
+
+
 @bp.route('/api/customers/<int:customer_id>', methods=['DELETE'])
 def delete_customer(customer_id):
     customer = Customer.query.get(customer_id)

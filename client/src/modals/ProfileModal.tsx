@@ -23,7 +23,7 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
         form.setFieldsValue(data);
       });
     } catch (error: any) {
-      message.error("获取用户信息失败：" + error.message);
+      message.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -34,7 +34,6 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
     setLoading(true);
     try {
       await updateCustomer(user.customer_id, values); // 调用服务函数
-      message.success("个人信息更新成功");
       onCancel(); // 关闭模态框
       onUpdateProfileSuccess(); // 调用父组件传递的回调函数
     } catch (error: any) {

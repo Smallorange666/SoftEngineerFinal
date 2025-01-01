@@ -24,10 +24,10 @@ export const fetchCustomerById = async (customer_id: number) => {
     const response = await fetch(`${API_BASE_URL}/customers/${customer_id}`);
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || "获取客户信息失败");
+      throw new Error(errorData.error);
     }
     const data = await response.json();
-    return data.data;
+    return data;
   } catch (error: any) {
     message.error("获取客户信息失败：" + error.message);
     throw error;
