@@ -53,3 +53,23 @@ export interface RentalInfo {
   color: string;
   price_per_day: number;
 }
+
+export interface AddCustomerModalProps {
+  visible: boolean; // 控制模态框显示
+  onCancel: () => void; // 取消按钮回调
+  onCreate: (values: any) => void; // 创建按钮回调
+}
+
+export interface CustomerInfo {
+  customer_id: number;
+  name: string;
+  phone: string;
+  address: string;
+  id_card: string;
+}
+
+export interface CreateCustomerInfo extends CustomerInfo {
+  username: string;
+  password: string;
+  role: string;
+}

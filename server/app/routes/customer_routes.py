@@ -7,12 +7,19 @@ from app import db
 @bp.route('/api/customers', methods=['GET'])
 def get_customers():
     customers = Customer.query.all()
-    return jsonify([customer.to_dict() for customer in customers])
+
+    result = {
+        'data': [
+            customer.to_dict() for customer in customers
+        ],
+        'total': len(customers)
+    }
+    return jsonify(result)
 
 
 @bp.route('/api/customers/<int:id>', methods=['GET'])
 def get_customer_by_id(id):
-    
+
     customer = Customer.query.filter_by(user_id=id).first()
     return jsonify(customer.to_dict())
 

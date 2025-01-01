@@ -4,9 +4,8 @@ import { Table, Input, Button, Space, message } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import AddVehicleModal from "../modals/AddVehiclesModal";
-import { Vehicle, VehicleInfo, User } from "../types";
-import RentalModal from "../modals/RentalModal";
+import { User, CustomerInfo, CreateCustomerInfo } from "../types";
+import AddCustomerModal from "../modals/AddCustomerModal";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -18,9 +17,9 @@ interface TableParams {
   pagination?: TablePaginationConfig;
 }
 
-const VehiclesPage: React.FC<User> = ({ user }) => {
-  const [data, setData] = useState<VehicleInfo[]>([]);
-  const [filteredData, setFilteredData] = useState<VehicleInfo[]>([]); // 筛选后的数据
+const CustomerPage: React.FC<User> = ({ user }) => {
+  const [data, setData] = useState<CustomerInfo[]>([]);
+  const [filteredData, setFilteredData] = useState<CustomerInfo[]>([]); // 筛选后的数据
   const [loading, setLoading] = useState(false);
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
@@ -32,35 +31,23 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef<any>(null);
 
-  const [isAddVehicleModalOpen, setIsAddVehicleModalOpen] = useState(false);
-  const [isRentModalOpen, setIsRentModalOpen] = useState(false);
-  const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(
-    null
-  );
+  const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
 
-  // 打开新增车辆浮层
-  const showAddVehicleModal = () => {
-    setIsAddVehicleModalOpen(true);
+  // 打开新增用户浮层
+  const showAddCustomerModal = () => {
+    setIsAddCustomerModalOpen(true);
   };
 
-  // 关闭新增车辆浮层
-  const cancelAddVehicleModal = () => {
-    setIsAddVehicleModalOpen(false);
-  };
-
-  const showRentalModal = () => {
-    setIsRentModalOpen(true);
-  };
-
-  const cancelRentalModal = () => {
-    setIsRentModalOpen(false);
+  // 关闭新增用户浮层
+  const cancelAddCustomerModal = () => {
+    setIsAddCustomerModalOpen(false);
   };
 
   // 搜索逻辑
   const handleSearch = (
     selectedKeys: string[],
     confirm: FilterDropdownProps["confirm"],
-    dataIndex: keyof VehicleInfo
+    dataIndex: keyof CustomerInfo
   ) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -98,8 +85,8 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
   };
 
   const getColumnSearchProps = (
-    dataIndex: keyof VehicleInfo
-  ): Exclude<TableProps<VehicleInfo>["columns"], undefined>[number] => ({
+    dataIndex: keyof CustomerInfo
+  ): Exclude<TableProps<CustomerInfo>["columns"], undefined>[number] => ({
     filterDropdown: ({
       setSelectedKeys,
       selectedKeys,
@@ -184,85 +171,47 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
   });
 
   // 列定义
-  const columns: ColumnsType<VehicleInfo> = [
+  const columns: ColumnsType<CustomerInfo> = [
     {
       title: "ID",
-      dataIndex: "vehicle_id",
+      dataIndex: "customer_id",
       width: "5%",
     },
     {
-      title: "车牌号",
-      dataIndex: "plate_number",
+      title: "姓名",
+      dataIndex: "name",
       width: "15%",
-      ...getColumnSearchProps("plate_number"),
+      ...getColumnSearchProps("name"),
     },
     {
-      title: "车辆类型",
-      dataIndex: "type",
-      width: "10%",
-      ...getColumnSearchProps("type"),
-    },
-    {
-      title: "品牌",
-      dataIndex: "brand",
-      width: "10%",
-      ...getColumnSearchProps("brand"),
-    },
-    {
-      title: "型号",
-      dataIndex: "model",
-      width: "10%",
-      ...getColumnSearchProps("model"),
-    },
-    {
-      title: "颜色",
-      dataIndex: "color",
-      width: "10%",
-      ...getColumnSearchProps("color"),
-    },
-    {
-      title: "日租金（元）",
-      dataIndex: "price_per_day",
+      title: "手机号",
+      dataIndex: "phone",
       width: "15%",
-      ...getColumnSearchProps("price_per_day"),
+      ...getColumnSearchProps("phone"),
     },
     {
-      title: "状态",
-      dataIndex: "status",
-      width: "10%",
-      ...getColumnSearchProps("status"),
+      title: "地址",
+      dataIndex: "address",
+      width: "20%",
+      ...getColumnSearchProps("address"),
+    },
+    {
+      title: "身份证号",
+      dataIndex: "id_card",
+      width: "20%",
+      ...getColumnSearchProps("id_card"),
     },
     {
       title: "操作",
       key: "action",
-      width: "20%",
-      render: (_, record) => (
-        <Space>
-          {user?.role === "admin" && (
-            <Button type="link" onClick={() => handleDelete(record.vehicle_id)}>
-              删除
-            </Button>
-          )}
-          {user?.role === "customer" && record.status === "可租用" && (
-            <Button
-              type="link"
-              onClick={() => {
-                showRentalModal();
-                setSelectedVehicleId(record.vehicle_id);
-              }}
-            >
-              租赁
-            </Button>
-          )}
-        </Space>
-      ),
+      width: "10%",
     },
   ];
 
   // 删除操作
-  const handleDelete = (vehicleId: number) => {
+  const handleDelete = (customerId: number) => {
     // 调用 API 删除车辆
-    fetch(`http://localhost:5000/api/vehicles/${vehicleId}`, {
+    fetch(`http://localhost:5000/api/vehicles/${customerId}`, {
       method: "DELETE",
     })
       .then((res) => {
@@ -280,9 +229,11 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
       });
   };
 
-  const handleCreate = async (values: Omit<Vehicle, "vehicle_id">) => {
+  const handleCreate = async (
+    values: Omit<CreateCustomerInfo, "customer_id">
+  ) => {
     // 调用 API 创建车辆
-    fetch("http://localhost:5000/api/vehicles", {
+    fetch("http://localhost:5000/api/customers", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -296,78 +247,19 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
           });
         }
         fetchData();
-        message.success("车辆创建成功");
-        setIsAddVehicleModalOpen(false);
+        message.success("客户创建成功");
+        setIsAddCustomerModalOpen(false);
       })
       .catch((error) => {
-        message.error("车辆创建失败：" + error.message);
+        message.error("客户创建失败：" + error.message);
         console.error("Error creating vehicle:", error);
       });
-  };
-
-  const handleRent = async (values: {
-    start_time: string;
-    duration_days: number;
-  }) => {
-    console.log(selectedVehicleId, values);
-
-    if (!selectedVehicleId) {
-      message.error("未选择车辆，无法租赁");
-      return;
-    }
-
-    try {
-      if (!user) {
-        message.error("用户未登录，无法租赁");
-        return;
-      }
-
-      const customerResponse = await fetch(
-        `http://localhost:5000/api/customers/${user.user_id}`
-      );
-      if (!customerResponse.ok) {
-        const errorData = await customerResponse.json();
-        throw new Error(errorData.error || "无法获取客户信息");
-      }
-
-      const customerData = await customerResponse.json();
-      const customerId = customerData.customer_id;
-
-      if (!customerId) {
-        throw new Error("未找到对应的客户信息");
-      }
-
-      const rentalResponse = await fetch("http://localhost:5000/api/rentals", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          vehicle_id: selectedVehicleId,
-          customer_id: customerId,
-          start_time: values.start_time,
-          duration_days: values.duration_days,
-        }),
-      });
-
-      if (!rentalResponse.ok) {
-        const errorData = await rentalResponse.json();
-        throw new Error(errorData.error || "租赁失败");
-      }
-
-      fetchData();
-      message.success("租赁成功");
-      setIsRentModalOpen(false);
-    } catch (error: any) {
-      message.error("租赁失败：" + error.message);
-      console.error("Error renting vehicle:", error);
-    }
   };
 
   // 获取数据
   const fetchData = () => {
     setLoading(true);
-    fetch("http://localhost:5000/api/vehicles")
+    fetch("http://localhost:5000/api/customers")
       .then((res) => {
         if (!res.ok) {
           throw new Error("Network response was not ok");
@@ -400,7 +292,7 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
     fetchData();
   }, []);
 
-  const handleTableChange: TableProps<VehicleInfo>["onChange"] = (
+  const handleTableChange: TableProps<CustomerInfo>["onChange"] = (
     pagination
   ) => {
     setTableParams({
@@ -414,35 +306,29 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={showAddVehicleModal}
+          onClick={showAddCustomerModal}
           style={{ marginBottom: 16 }}
         >
-          新增车辆
+          新增用户
         </Button>
       )}
 
-      <Table<VehicleInfo>
+      <Table<CustomerInfo>
         columns={columns}
-        rowKey={(record) => record.vehicle_id.toString()}
+        rowKey={(record) => record.customer_id.toString()}
         dataSource={filteredData} // 使用筛选后的数据
         pagination={tableParams.pagination}
         loading={loading}
         onChange={handleTableChange}
       />
 
-      <AddVehicleModal
-        visible={isAddVehicleModalOpen}
-        onCancel={cancelAddVehicleModal}
+      <AddCustomerModal
+        visible={isAddCustomerModalOpen}
+        onCancel={cancelAddCustomerModal}
         onCreate={handleCreate}
-      />
-
-      <RentalModal
-        open={isRentModalOpen}
-        onCancel={cancelRentalModal}
-        onRent={handleRent}
       />
     </div>
   );
 };
 
-export default VehiclesPage;
+export default CustomerPage;
