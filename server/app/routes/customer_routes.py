@@ -12,6 +12,7 @@ def get_customers():
 
 @bp.route('/api/customers/<int:id>', methods=['GET'])
 def get_customer_by_id(id):
+    
     customer = Customer.query.filter_by(user_id=id).first()
     return jsonify(customer.to_dict())
 

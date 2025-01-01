@@ -1,5 +1,13 @@
-export interface AppProps {
-  user: { user_id: number; username: string; role: string } | null;
+export interface User {
+  user: {
+    user_id: number;
+    username: string;
+    role: string;
+    customer_id: number;
+  };
+}
+
+export interface AppProps extends User {
   onLogout: () => void;
 }
 
@@ -15,10 +23,6 @@ export interface Vehicle {
 
 export interface VehicleInfo extends Vehicle {
   status: string; // 添加状态字段
-}
-
-export interface VehiclesPageProps {
-  user: { user_id: number; role: string } | null;
 }
 
 export interface AddVehicleModalProps {
@@ -48,11 +52,4 @@ export interface RentalInfo {
   model: string;
   color: string;
   price_per_day: number;
-}
-
-export interface MyRentalsPageProps {
-  user: {
-    user_id: number;
-    role: string;
-  };
 }

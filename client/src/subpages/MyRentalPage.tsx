@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import type { TableProps } from "antd";
-import { Table, message } from "antd";
-import { RentalInfo } from "./types";
-import { MyRentalsPageProps } from "./types";
+import { Table, Tag, message } from "antd";
+import { RentalInfo } from "../types";
+import { User } from "../types";
 
-const MyRentalsPage: React.FC<MyRentalsPageProps> = ({ user }) => {
+const MyRentalsPage: React.FC<User> = ({ user }) => {
   const [data, setData] = useState<RentalInfo[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -92,6 +92,15 @@ const MyRentalsPage: React.FC<MyRentalsPageProps> = ({ user }) => {
       title: "状态",
       dataIndex: "status",
       key: "status",
+      render: (status: string) => {
+        let color = "default";
+        if (status === "进行中") {
+          color = "green";
+        } else if (status === "已逾期") {
+          color = "red";
+        }
+        return <Tag color={color}>{status}</Tag>;
+      },
     },
   ];
 

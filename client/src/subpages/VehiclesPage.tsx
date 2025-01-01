@@ -4,9 +4,9 @@ import { Table, Input, Button, Space, message } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import AddVehicleModal from "./components/AddVehiclesModal";
-import { Vehicle, VehicleInfo, VehiclesPageProps } from "./types";
-import RentalModal from "./components/RentalModal";
+import AddVehicleModal from "../modals/AddVehiclesModal";
+import { Vehicle, VehicleInfo, User } from "../types";
+import RentalModal from "../modals/RentalModal";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -18,7 +18,7 @@ interface TableParams {
   pagination?: TablePaginationConfig;
 }
 
-const VehiclesPage: React.FC<VehiclesPageProps> = ({ user }) => {
+const VehiclesPage: React.FC<User> = ({ user }) => {
   const [data, setData] = useState<VehicleInfo[]>();
   const [loading, setLoading] = useState(false);
   const [tableParams, setTableParams] = useState<TableParams>({

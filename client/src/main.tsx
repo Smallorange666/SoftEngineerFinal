@@ -14,6 +14,7 @@ const Root: React.FC = () => {
     user_id: number;
     username: string;
     role: string;
+    customer_id: number;
   } | null>(null); // 用户状态
 
   return (

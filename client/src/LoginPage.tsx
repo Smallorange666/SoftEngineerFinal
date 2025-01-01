@@ -1,19 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Form, Input, Card, message } from "antd";
-import RegisterModal from "./components/RegisterModal"; // 导入 RegisterModal
-
-interface User {
-  user_id: number;
-  username: string;
-  role: string;
-}
+import RegisterModal from "./modals/RegisterModal";
+import type { User } from "./types";
 
 const LoginPage: React.FC<{
   onLoginSuccess: (user: {
     user_id: number;
     username: string;
     role: string;
+    customer_id: number;
   }) => void;
 }> = ({ onLoginSuccess }) => {
   const navigate = useNavigate();
@@ -47,9 +43,10 @@ const LoginPage: React.FC<{
       // 登录成功
       message.success("登录成功");
       onLoginSuccess({
-        user_id: userData.user_id,
-        username: userData.username,
-        role: userData.role,
+        user_id: userData.user.user_id,
+        username: userData.user.username,
+        role: userData.user.role,
+        customer_id: userData.user.customer_id,
       });
       navigate("/"); // 跳转到主页面
     } catch (error: any) {

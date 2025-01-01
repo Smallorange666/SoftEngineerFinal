@@ -3,27 +3,58 @@ from app.routes import bp
 from app.models import Rental, Vehicle, Customer
 from app import db
 from datetime import datetime, timedelta
-from sqlalchemy.orm import joinedload
 
 # 定义有效的租赁状态
-VALID_RENTAL_STATUS = ['进行中', '已完成', '已取消']
+VALID_RENTAL_STATUS = ['进行中', '已完成', '已逾期']
+
+
+def check_and_update_rental_status():
+    """
+    检查所有租赁记录，如果有到时间未归还的，更新状态为 '已逾期'
+    """
+    try:
+        # 获取所有状态为 '进行中' 且预期归还时间已过的租赁记录
+        overdue_rentals = Rental.query.filter(
+            Rental.status == '进行中',
+            Rental.expected_return_time < datetime.now()
+        ).all()
+
+        # 更新状态为 '已逾期'
+        for rental in overdue_rentals:
+            rental.status = '已逾期'
+            db.session.add(rental)
+
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating rental status: {e}")
 
 
 @bp.route('/api/rentals', methods=['GET'])
 def get_rentals():
+    # 检查并更新租赁状态
+    check_and_update_rental_status()
+
+    # 获取所有租赁记录
     rentals = Rental.query.all()
     return jsonify([rental.to_dict() for rental in rentals])
 
 
 @bp.route('/api/rentals/<int:id>', methods=['GET'])
 def get_rental(id):
+    # 检查并更新租赁状态
+    check_and_update_rental_status()
+
+    # 获取指定租赁记录
     rental = Rental.query.get_or_404(id)
     return jsonify(rental.to_dict())
 
 
-# 获取某个用户的所有租赁记录，只有在用户自己登录时才能访问，所以用user_id
 @bp.route('/api/rentals/customer/<int:user_id>', methods=['GET'])
 def get_customer_rentals(user_id):
+    # 检查并更新租赁状态
+    check_and_update_rental_status()
+
     # 验证客户是否存在
     try:
         customer = Customer.query.filter_by(user_id=user_id).one()
@@ -35,6 +66,7 @@ def get_customer_rentals(user_id):
         Rental.query
         .filter_by(customer_id=customer.customer_id)
         .join(Vehicle)  # 联表查询车辆信息
+        .order_by(Rental.start_time.desc())  # 按 start_time 降序排序
         .all()
     )
 
@@ -72,6 +104,15 @@ def create_rental():
     missing_fields = [field for field in required_fields if field not in data]
     if missing_fields:
         return jsonify({'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+
+    # 检查用户本人是否存在逾期未还的租赁记录
+    customer_id = data['customer_id']
+    overdue_rental = Rental.query.filter(
+        Rental.customer_id == customer_id,
+        Rental.status == '已逾期'
+    ).first()
+    if overdue_rental:
+        return jsonify({'error': 'Customer has overdue rental'}), 400
 
     # 验证租赁天数
     try:

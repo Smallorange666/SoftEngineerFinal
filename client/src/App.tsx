@@ -4,12 +4,14 @@ import {
   CarOutlined,
   UserOutlined,
   LoginOutlined,
+  ProfileFilled,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Layout, Menu, theme, Button } from "antd";
 import { useNavigate } from "react-router-dom";
-import VehiclePage from "./VehiclesPage.tsx";
-import MyRentalPage from "./MyRentalPage.tsx";
+import VehiclePage from "./subpages/VehiclesPage.tsx";
+import MyRentalPage from "./subpages/MyRentalPage.tsx";
+import ProfilePage from "./subpages/ProfilePage.tsx";
 import { AppProps } from "./types.ts";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -86,17 +88,15 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
   const renderContent = () => {
     switch (selectedKey) {
       case "1":
-        if (user) {
-          return <VehiclePage user={user} />;
-        } else return null;
+        return user.role === "admin" ? <VehiclePage user={user} /> : null;
       case "2":
-        if (user) {
-          return user.role === "admin" ? null : (
-            <MyRentalPage user={{ user_id: user.user_id, role: user.role }} />
-          );
-        } else return null;
+        return user.role === "admin" ? null : <MyRentalPage user={user} />;
       case "3":
-        return user?.role === "admin" ? <div>进行中的租赁</div> : null;
+        return user?.role === "admin" ? (
+          <div>进行中的租赁</div>
+        ) : (
+          <ProfilePage user={user} />
+        );
       case "4":
         return user?.role === "admin" ? <div>已结束的租赁</div> : null;
       default:

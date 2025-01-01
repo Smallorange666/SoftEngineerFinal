@@ -1,3 +1,7 @@
+from werkzeug.security import check_password_hash
+from .models import User, Customer
+from . import db
+from flask import request, jsonify
 from flask import jsonify, request
 from app.routes import bp
 from app.models import User, Customer
@@ -99,11 +103,17 @@ def login():
         if not check_password_hash(user.password_hash, data['password']):
             return jsonify({'error': '用户名或密码错误'}), 401
 
-        # 登录成功，返回用户信息
+        # 查找关联的客户信息
+        customer = Customer.query.filter_by(user_id=user.user_id).first()
+        if not customer:
+            return jsonify({'error': '未找到关联的客户信息'}), 404
+
+        # 登录成功，返回用户信息和 customer_id
         return jsonify({
             'user_id': user.user_id,
             'username': user.username,
-            'role': user.role
+            'role': user.role,
+            'customer_id': customer.customer_id
         }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
