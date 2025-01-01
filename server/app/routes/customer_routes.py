@@ -1,19 +1,31 @@
 from flask import jsonify, request, Blueprint
 from app.routes import bp
-from app.models import Customer, Rental
+from app.models import Customer, Rental, User
 from app import db
+from app.models import User
 
 
 @bp.route('/api/customers', methods=['GET'])
 def get_customers():
-    customers = Customer.query.all()
+    # 联表查询 Customer 和 User
+    customers = (
+        db.session.query(Customer, User.username)
+        .join(User, Customer.user_id == User.user_id, isouter=True)
+        .all()
+    )
 
+    # 构造返回数据
     result = {
         'data': [
-            customer.to_dict() for customer in customers
+            {
+                **customer.to_dict(),  # Customer 表字段
+                'username': username   # 添加 username 字段
+            }
+            for customer, username in customers
         ],
         'total': len(customers)
     }
+
     return jsonify(result)
 
 

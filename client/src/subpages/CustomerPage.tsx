@@ -178,6 +178,12 @@ const CustomerPage: React.FC<User> = ({ user }) => {
       width: "5%",
     },
     {
+      title: "用户名",
+      dataIndex: "username",
+      width: "15%",
+      ...getColumnSearchProps("username"),
+    },
+    {
       title: "姓名",
       dataIndex: "name",
       width: "15%",

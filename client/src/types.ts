@@ -62,6 +62,7 @@ export interface AddCustomerModalProps {
 
 export interface CustomerInfo {
   customer_id: number;
+  username: string;
   name: string;
   phone: string;
   address: string;
@@ -69,7 +70,6 @@ export interface CustomerInfo {
 }
 
 export interface CreateCustomerInfo extends CustomerInfo {
-  username: string;
   password: string;
   role: string;
 }
