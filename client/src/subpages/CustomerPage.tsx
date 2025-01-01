@@ -211,13 +211,20 @@ const CustomerPage: React.FC<User> = ({ user }) => {
       title: "操作",
       key: "action",
       width: "10%",
+      render: (_, record) => (
+        <Space>
+          <Button type="link" onClick={() => handleDelete(record.customer_id)}>
+            删除
+          </Button>
+        </Space>
+      ),
     },
   ];
 
   // 删除操作
-  const handleDelete = (customerId: number) => {
+  const handleDelete = (customer_id: number) => {
     // 调用 API 删除车辆
-    fetch(`http://localhost:5000/api/vehicles/${customerId}`, {
+    fetch(`http://localhost:5000/api/customers/${customer_id}`, {
       method: "DELETE",
     })
       .then((res) => {
@@ -227,11 +234,10 @@ const CustomerPage: React.FC<User> = ({ user }) => {
           });
         }
         fetchData();
-        message.success("车辆删除成功");
+        message.success("用户删除成功");
       })
       .catch((error) => {
-        message.error("车辆删除失败：" + error.message);
-        console.error("Error deleting vehicle:", error);
+        message.error("用户删除失败：" + error.message);
       });
   };
 

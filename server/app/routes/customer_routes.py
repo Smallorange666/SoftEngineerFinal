@@ -11,6 +11,7 @@ def get_customers():
     customers = (
         db.session.query(Customer, User.username)
         .join(User, Customer.user_id == User.user_id, isouter=True)
+        .filter(Customer.is_deleted == False)
         .all()
     )
 
@@ -29,14 +30,22 @@ def get_customers():
     return jsonify(result)
 
 
-@bp.route('/api/customers/<int:id>', methods=['GET'])
-def get_customer_by_id(id):
+@bp.route('/api/customers/<int:customer_id>', methods=['DELETE'])
+def delete_customer(customer_id):
+    customer = Customer.query.get(customer_id)
+    if not customer:
+        return jsonify({'error': 'Customer not found'}), 404
 
-    customer = Customer.query.filter_by(user_id=id).first()
-    return jsonify(customer.to_dict())
+    try:
+        customer.is_deleted = True
+        db.session.commit()
+        return '', 204
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
 
 
-@bp.route('/api/customers/<int:customer_id>', methods=['PUT'])
+@ bp.route('/api/customers/<int:customer_id>', methods=['PUT'])
 def update_customer(customer_id):
     customer = Customer.query.get_or_404(customer_id)
     data = request.get_json()
@@ -72,7 +81,7 @@ def update_customer(customer_id):
         return jsonify({'error': str(e)}), 400
 
 
-@bp.route('/api/customers/<int:id>/rentals', methods=['GET'])
+@ bp.route('/api/customers/<int:id>/rentals', methods=['GET'])
 def get_customer_rental_history(id):
     customer = Customer.query.get_or_404(id)
     rentals = Rental.query.filter_by(customer_id=id).all()
