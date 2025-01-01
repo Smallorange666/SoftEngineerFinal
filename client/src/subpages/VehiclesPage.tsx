@@ -19,7 +19,8 @@ interface TableParams {
 }
 
 const VehiclesPage: React.FC<User> = ({ user }) => {
-  const [data, setData] = useState<VehicleInfo[]>();
+  const [data, setData] = useState<VehicleInfo[]>([]);
+  const [filteredData, setFilteredData] = useState<VehicleInfo[]>([]); // 筛选后的数据
   const [loading, setLoading] = useState(false);
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
@@ -35,7 +36,7 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
   const [isRentModalOpen, setIsRentModalOpen] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(
     null
-  ); // 记录当前租赁的车辆 ID
+  );
 
   // 打开新增车辆浮层
   const showAddVehicleModal = () => {
@@ -64,11 +65,36 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
     confirm();
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex as string);
+
+    // 根据筛选条件过滤数据
+    const filtered = data.filter((item) =>
+      item[dataIndex]
+        ?.toString()
+        .toLowerCase()
+        .includes(selectedKeys[0].toLowerCase())
+    );
+    setFilteredData(filtered);
+    setTableParams({
+      pagination: {
+        ...tableParams.pagination,
+        current: 1, // 重置到第一页
+        total: filtered.length, // 更新总数
+      },
+    });
   };
 
   const handleReset = (clearFilters: () => void) => {
     clearFilters();
     setSearchText("");
+    setSearchedColumn("");
+    setFilteredData(data); // 恢复原始数据
+    setTableParams({
+      pagination: {
+        ...tableParams.pagination,
+        current: 1, // 重置到第一页
+        total: data.length, // 恢复总数
+      },
+    });
   };
 
   const getColumnSearchProps = (
@@ -217,7 +243,6 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
               删除
             </Button>
           )}
-          {/* 普通用户显示“租赁”按钮 */}
           {user?.role === "customer" && record.status === "可租用" && (
             <Button
               type="link"
@@ -242,17 +267,14 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
     })
       .then((res) => {
         if (!res.ok) {
-          // 如果响应状态码不是 2xx，解析错误信息
           return res.json().then((errorData) => {
             throw new Error(errorData.error);
           });
         }
-        // 删除成功后重新加载数据
         fetchData();
         message.success("车辆删除成功");
       })
       .catch((error) => {
-        // 显示错误提示
         message.error("车辆删除失败：" + error.message);
         console.error("Error deleting vehicle:", error);
       });
@@ -269,18 +291,15 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
     })
       .then((res) => {
         if (!res.ok) {
-          // 如果响应状态码不是 2xx，解析错误信息
           return res.json().then((errorData) => {
             throw new Error(errorData.error);
           });
         }
-        // 创建成功后重新加载数据
         fetchData();
         message.success("车辆创建成功");
-        setIsAddVehicleModalOpen(false); // 关闭 Modal
+        setIsAddVehicleModalOpen(false);
       })
       .catch((error) => {
-        // 显示错误提示
         message.error("车辆创建失败：" + error.message);
         console.error("Error creating vehicle:", error);
       });
@@ -298,7 +317,6 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
     }
 
     try {
-      // 第一步：根据 user_id 查询 customer_id
       if (!user) {
         message.error("用户未登录，无法租赁");
         return;
@@ -319,7 +337,6 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
         throw new Error("未找到对应的客户信息");
       }
 
-      // 第二步：调用 API 处理租赁逻辑
       const rentalResponse = await fetch("http://localhost:5000/api/rentals", {
         method: "POST",
         headers: {
@@ -338,10 +355,9 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
         throw new Error(errorData.error || "租赁失败");
       }
 
-      // 租赁成功后刷新数据
       fetchData();
       message.success("租赁成功");
-      setIsRentModalOpen(false); // 关闭 Modal
+      setIsRentModalOpen(false);
     } catch (error: any) {
       message.error("租赁失败：" + error.message);
       console.error("Error renting vehicle:", error);
@@ -351,15 +367,7 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
   // 获取数据
   const fetchData = () => {
     setLoading(true);
-
-    // 构造查询参数
-    const page = tableParams.pagination?.current || 1;
-    const pageSize = tableParams.pagination?.pageSize || 10;
-
-    // 发起请求
-    fetch(
-      `http://localhost:5000/api/vehicles?page=${page}&pageSize=${pageSize}`
-    )
+    fetch("http://localhost:5000/api/vehicles")
       .then((res) => {
         if (!res.ok) {
           throw new Error("Network response was not ok");
@@ -367,15 +375,14 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
         return res.json();
       })
       .then((response) => {
-        // 确保 response.data 是一个数组
         if (Array.isArray(response.data)) {
-          setData(response.data); // 设置表格数据
+          setData(response.data);
+          setFilteredData(response.data); // 初始化筛选数据
           setLoading(false);
           setTableParams({
-            ...tableParams,
             pagination: {
               ...tableParams.pagination,
-              total: response.total, // 更新总条数
+              total: response.data.length, // 更新总数
             },
           });
         } else {
@@ -391,7 +398,7 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
 
   useEffect(() => {
     fetchData();
-  }, [tableParams.pagination?.current, tableParams.pagination?.pageSize]);
+  }, []);
 
   const handleTableChange: TableProps<VehicleInfo>["onChange"] = (
     pagination
@@ -399,15 +406,10 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
     setTableParams({
       pagination,
     });
-
-    if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-      setData([]);
-    }
   };
 
   return (
     <div>
-      {/* 新增车辆按钮 */}
       {user?.role === "admin" && (
         <Button
           type="primary"
@@ -419,17 +421,15 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
         </Button>
       )}
 
-      {/* 车辆表格 */}
       <Table<VehicleInfo>
         columns={columns}
         rowKey={(record) => record.vehicle_id.toString()}
-        dataSource={data}
+        dataSource={filteredData} // 使用筛选后的数据
         pagination={tableParams.pagination}
         loading={loading}
         onChange={handleTableChange}
       />
 
-      {/* 新增车辆浮层 */}
       <AddVehicleModal
         visible={isAddVehicleModalOpen}
         onCancel={cancelAddVehicleModal}
