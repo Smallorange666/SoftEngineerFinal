@@ -7,11 +7,7 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     role = db.Column(db.String(20), nullable=False)
-    
-    def __init__(self, username, password_hash, role):
-        self.username = username
-        self.password_hash = password_hash
-        self.role = role
+    is_deleted = db.Column(db.Boolean, default=False, nullable=False)
     
     def to_dict(self):
         return {

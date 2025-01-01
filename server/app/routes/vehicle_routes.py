@@ -12,36 +12,29 @@ PLATE_NUMBER_PATTERN = re.compile(r'^[\u4e00-\u9fa5][A-Z][A-Z0-9]{5}$')
 
 @bp.route('/api/vehicles', methods=['GET'])
 def get_vehicles_info():
-    # 获取分页参数
-    page = request.args.get('page', default=1, type=int)
-    page_size = request.args.get('pageSize', default=10, type=int)
-
     # 连表查询车辆及其租赁状态
     vehicles = (
-        db.session.query(
-            Vehicle,
-            Rental.status
-        )
+        db.session.query(Vehicle, Rental.status)
         .join(Rental, Vehicle.vehicle_id == Rental.vehicle_id, isouter=True)
-        .paginate(page=page, per_page=page_size, error_out=False)
-    )
+        .filter(Vehicle.is_deleted == False)
+        .order_by(Vehicle.vehicle_id.asc())
+        .all())
 
-    # 构造返回数据
     result = {
         'data': [
             {
                 **vehicle.to_dict(),
                 'status': '忙碌中' if status == '进行中' or status == '已逾期' else '可租用'
             }
-            for vehicle, status in vehicles.items
+            for vehicle, status in vehicles
         ],
-        'total': vehicles.total
+        'total': len(vehicles)  # 返回实际数据条数
     }
 
     return jsonify(result)
 
 
-@bp.route('/api/vehicles', methods=['POST'])
+@ bp.route('/api/vehicles', methods=['POST'])
 def create_vehicle():
     data = request.get_json()
 
@@ -86,7 +79,7 @@ def create_vehicle():
         return jsonify({'error': str(e)}), 400
 
 
-@bp.route('/api/vehicles/<int:id>', methods=['PUT'])
+@ bp.route('/api/vehicles/<int:id>', methods=['PUT'])
 def update_vehicle(id):
     vehicle = Vehicle.query.get_or_404(id)
     data = request.get_json()
@@ -129,16 +122,19 @@ def update_vehicle(id):
         return jsonify({'error': str(e)}), 400
 
 
-@bp.route('/api/vehicles/<int:id>', methods=['DELETE'])
+@ bp.route('/api/vehicles/<int:id>', methods=['DELETE'])
 def delete_vehicle(id):
-    vehicle = Vehicle.query.get_or_404(id)
+    vehicle = Vehicle.query.get(id)
+
+    if (vehicle is None):
+        return jsonify({'error': 'Vehicle not found'}), 404
 
     # 检查车辆是否有关联的租赁记录
     if Rental.query.filter_by(vehicle_id=id).first():
         return jsonify({'error': 'Cannot delete vehicle with associated rentals'}), 400
 
     try:
-        db.session.delete(vehicle)
+        vehicle.is_deleted = True
         db.session.commit()
         return '', 204
     except Exception as e:
