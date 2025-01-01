@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class Vehicle(db.Model):
@@ -12,9 +12,9 @@ class Vehicle(db.Model):
     color = db.Column(db.String(20), nullable=False)
     price_per_day = db.Column(db.Numeric(10, 2), nullable=False)
     plate_number = db.Column(db.String(20), unique=True, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     updated_at = db.Column(
-        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+        db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     rentals = db.relationship('Rental', backref='vehicle', lazy=True)
 

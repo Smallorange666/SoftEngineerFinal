@@ -180,13 +180,13 @@ const CustomerPage: React.FC<User> = ({ user }) => {
     {
       title: "用户名",
       dataIndex: "username",
-      width: "15%",
+      width: "10%",
       ...getColumnSearchProps("username"),
     },
     {
       title: "姓名",
       dataIndex: "name",
-      width: "15%",
+      width: "10%",
       ...getColumnSearchProps("name"),
     },
     {
@@ -204,7 +204,7 @@ const CustomerPage: React.FC<User> = ({ user }) => {
     {
       title: "身份证号",
       dataIndex: "id_card",
-      width: "20%",
+      width: "15%",
       ...getColumnSearchProps("id_card"),
     },
     {

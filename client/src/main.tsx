@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client"; // 使用 createRoot
 import {
   BrowserRouter as Router,
   Routes,
@@ -43,4 +43,9 @@ const Root: React.FC = () => {
   );
 };
 
-ReactDOM.render(<Root />, document.getElementById("root"));
+// 使用 createRoot 渲染应用
+const container = document.getElementById("root");
+if (container) {
+  const root = createRoot(container);
+  root.render(<Root />);
+}
