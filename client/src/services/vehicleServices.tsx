@@ -8,12 +8,48 @@ export const fetchAllVehicles = async () => {
     const response = await fetch(`${API_BASE_URL}/vehicles`);
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || "获取车辆列表失败");
+      throw new Error(errorData.error);
     }
     const data = await response.json();
     return data.data;
   } catch (error: any) {
     message.error("获取车辆列表失败：" + error.message);
+    throw error;
+  }
+};
+
+export const fetchVehicleById = async (vehicle_id: number) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/vehicles/${vehicle_id}`);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error: any) {
+    message.error("获取车辆信息失败：" + error.message);
+    throw error;
+  }
+};
+
+export const updateVehicle = async (vehicle_id: number, values: any) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/vehicles/${vehicle_id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...values,
+      }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error);
+    }
+  } catch (error: any) {
+    message.error("更新车辆信息失败" + error.message);
     throw error;
   }
 };

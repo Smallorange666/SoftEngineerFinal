@@ -11,7 +11,7 @@ PLATE_NUMBER_PATTERN = re.compile(r'^[\u4e00-\u9fa5][A-Z][A-Z0-9]{5}$')
 
 
 @bp.route('/api/vehicles', methods=['GET'])
-def get_vehicles_info():
+def get_vehicles_and_rantal_info():
     # 连表查询车辆及其租赁状态
     vehicles = (
         db.session.query(Vehicle, Rental.status)
@@ -32,6 +32,15 @@ def get_vehicles_info():
     }
 
     return jsonify(result)
+
+
+@bp.route('/api/vehicles/<int:vehicle_id>', methods=['GET'])
+def get_vehicles_by_id(vehicle_id):
+    vehicle = Vehicle.query.filter_by(
+        vehicle_id=vehicle_id).filter_by(is_deleted=False).first()
+    if vehicle is None:
+        return jsonify({'error': 'Vehicle not found'}), 404
+    return jsonify(vehicle.to_dict())
 
 
 @ bp.route('/api/vehicles', methods=['POST'])
@@ -79,13 +88,17 @@ def create_vehicle():
         return jsonify({'error': str(e)}), 400
 
 
-@ bp.route('/api/vehicles/<int:id>', methods=['PUT'])
-def update_vehicle(id):
-    vehicle = Vehicle.query.get_or_404(id)
-    data = request.get_json()
+@ bp.route('/api/vehicles/<int:vehicle_id>', methods=['PUT'])
+def update_vehicle(vehicle_id):
+    vehicle = Vehicle.query.filter_by(
+        vehicle_id=vehicle_id).filter_by(is_deleted=False).first()
+    if vehicle is None:
+        return jsonify({'error': 'Vehicle not found'}), 404
 
     try:
         # 验证类型不能为空
+        data = request.get_json()
+
         if 'type' in data:
             if not data['type'].strip():
                 return jsonify({'error': 'Vehicle type cannot be empty'}), 400
@@ -97,7 +110,7 @@ def update_vehicle(id):
                 price = float(data['price_per_day'])
                 if price <= 0:
                     return jsonify({'error': 'Price must be positive'}), 400
-                data['price_per_day'] = price
+                vehicle.price_per_day = price
             except ValueError:
                 return jsonify({'error': 'Invalid price format'}), 400
 

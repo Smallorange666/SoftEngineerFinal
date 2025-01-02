@@ -91,3 +91,10 @@ export interface DeleteAccountModalProps extends User {
   onCancel: () => void; // 关闭模态框的回调s
   onDeleteAccountSuccess: () => void; // 注销账号的回调
 }
+
+export interface UpdateVehicleModalProps {
+  vehicle_id: number | null;
+  visible: boolean;
+  onCancel: () => void;
+  onUpdateSuccess: () => void;
+}

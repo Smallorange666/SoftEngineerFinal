@@ -6,6 +6,7 @@ import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import AddVehicleModal from "../modals/AddVehiclesModal";
 import { Vehicle, VehicleInfo, User } from "../types";
+import UpdateVehicleModal from "../modals/UpdateVehicleModal.tsx";
 import RentalModal from "../modals/RentalModal";
 import {
   fetchAllVehicles,
@@ -42,6 +43,8 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
 
   const [isAddVehicleModalOpen, setIsAddVehicleModalOpen] = useState(false);
   const [isRentModalOpen, setIsRentModalOpen] = useState(false);
+  const [isUpdateVehicleModalOpen, setIsUpdateVehicleModalOpen] =
+    useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(
     null
   );
@@ -62,6 +65,14 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
 
   const cancelRentalModal = () => {
     setIsRentModalOpen(false);
+  };
+
+  const showUpdateVehicleModal = () => {
+    setIsUpdateVehicleModalOpen(true);
+  };
+
+  const cancelUpdateVehicleModal = () => {
+    setIsUpdateVehicleModalOpen(false);
   };
 
   // 搜索逻辑
@@ -251,6 +262,17 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
               删除
             </Button>
           )}
+          {user?.role === "admin" && (
+            <Button
+              type="link"
+              onClick={() => {
+                showUpdateVehicleModal();
+                setSelectedVehicleId(record.vehicle_id);
+              }}
+            >
+              修改信息
+            </Button>
+          )}
           {user?.role === "customer" && record.status === "可租用" && (
             <Button
               type="link"
@@ -372,6 +394,13 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
         visible={isAddVehicleModalOpen}
         onCancel={cancelAddVehicleModal}
         onCreate={handleCreate}
+      />
+
+      <UpdateVehicleModal
+        vehicle_id={selectedVehicleId}
+        visible={isUpdateVehicleModalOpen}
+        onCancel={cancelUpdateVehicleModal}
+        onUpdateSuccess={fetchData}
       />
 
       <RentalModal

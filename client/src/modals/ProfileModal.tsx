@@ -16,7 +16,7 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
   const [loading, setLoading] = useState(false);
 
   // 获取用户信息
-  const fillProfile = async () => {
+  const fillForm = async () => {
     setLoading(true);
     try {
       fetchCustomerById(user.customer_id).then((data) => {
@@ -45,7 +45,7 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
 
   useEffect(() => {
     if (visible && user?.user_id) {
-      fillProfile();
+      fillForm();
     }
   }, [visible, user?.user_id]);
 
