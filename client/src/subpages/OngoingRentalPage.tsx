@@ -7,6 +7,7 @@ import Highlighter from "react-highlight-words";
 import { OngoningRentalInfo } from "../types";
 import { fetchOngoingRental } from "../services/rentServices";
 import CancelRentalModal from "../modals/CancelRentalModal";
+import ReturnRentalModal from "../modals/RenturnModal";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -34,6 +35,7 @@ const OngoingRentalPage: React.FC = () => {
 
   const [selectedRentalId, setSelectedRentalId] = useState<number | null>(null);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
 
   const showCancelModal = () => {
     setIsCancelModalOpen(true);
@@ -41,6 +43,14 @@ const OngoingRentalPage: React.FC = () => {
 
   const cancelCancelModal = () => {
     setIsCancelModalOpen(false);
+  };
+
+  const showReturnModal = () => {
+    setIsReturnModalOpen(true);
+  };
+
+  const cancelReturnModal = () => {
+    setIsReturnModalOpen(false);
   };
 
   // 搜索逻辑
@@ -215,6 +225,15 @@ const OngoingRentalPage: React.FC = () => {
             type="link"
             onClick={() => {
               setSelectedRentalId(record.rental_id);
+              showReturnModal();
+            }}
+          >
+            确认归还
+          </Button>
+          <Button
+            type="link"
+            onClick={() => {
+              setSelectedRentalId(record.rental_id);
               showCancelModal();
             }}
           >
@@ -266,6 +285,16 @@ const OngoingRentalPage: React.FC = () => {
         pagination={tableParams.pagination}
         loading={loading}
         onChange={handleTableChange}
+      />
+
+      <ReturnRentalModal
+        rental_id={selectedRentalId as number}
+        open={isReturnModalOpen}
+        onCancel={cancelReturnModal}
+        onReturnSuccess={async () => {
+          await fetchData();
+          cancelReturnModal();
+        }}
       />
 
       <CancelRentalModal

@@ -6,6 +6,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { OverdueRentalInfo } from "../types";
 import { fetchOverdueRental } from "../services/rentServices";
+import ReturnRentalModal from "../modals/RenturnModal";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -30,6 +31,17 @@ const OverdueRentalPage: React.FC = () => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef<any>(null);
+
+  const [selectedRentalId, setSelectedRentalId] = useState<number | null>(null);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+
+  const showReturnModal = () => {
+    setIsReturnModalOpen(true);
+  };
+
+  const cancelReturnModal = () => {
+    setIsReturnModalOpen(false);
+  };
 
   // 搜索逻辑
   const handleSearch = (
@@ -193,6 +205,24 @@ const OverdueRentalPage: React.FC = () => {
       dataIndex: "expected_return_time",
       width: "15%",
     },
+    {
+      title: "操作",
+      key: "action",
+      width: "20%",
+      render: (_, record) => (
+        <Space size="middle">
+          <Button
+            type="link"
+            onClick={() => {
+              setSelectedRentalId(record.rental_id);
+              showReturnModal();
+            }}
+          >
+            确认归还
+          </Button>
+        </Space>
+      ),
+    },
   ];
 
   // 获取数据
@@ -236,6 +266,14 @@ const OverdueRentalPage: React.FC = () => {
         pagination={tableParams.pagination}
         loading={loading}
         onChange={handleTableChange}
+      />
+
+      {/* 归还模态框 */}
+      <ReturnRentalModal
+        rental_id={selectedRentalId as number}
+        open={isReturnModalOpen}
+        onCancel={cancelReturnModal}
+        onReturnSuccess={fetchData}
       />
     </div>
   );

@@ -83,6 +83,13 @@ export interface FinishedRentalInfo extends BaseRentalInfo {
 
 export interface CanceledRentalInfo extends BaseRentalInfo {}
 
+export interface ReturnModalProps {
+  rental_id: number;
+  open: boolean;
+  onCancel: () => void;
+  onReturnSuccess: () => void;
+}
+
 export interface AddCustomerModalProps {
   open: boolean; // 控制模态框显示
   onCancel: () => void; // 取消按钮回调

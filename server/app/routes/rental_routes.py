@@ -358,3 +358,24 @@ def cancel_rental(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 400
+
+
+@bp.route('/api/rentals/<int:rental_id>', methods=['PATCH'])
+def return_vehicle(rental_id):
+    rental = Rental.query.get(rental_id)
+    if not rental:
+        return jsonify({'error': 'Rental not found'}), 404
+
+    try:
+        # 只有进行中的租赁才能还车
+        if rental.status not in ['进行中', '已逾期']:
+            return jsonify({'error': 'Only ongoing or overdue rentals can be returned'}), 400
+
+        # 更新租赁状态为 '已完成'
+        rental.status = '已完成'
+        rental.actual_return_time = datetime.now()
+        db.session.commit()
+        return '', 204
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500

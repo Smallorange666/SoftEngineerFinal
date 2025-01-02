@@ -1,3 +1,4 @@
+from flask import jsonify
 from flask import request, jsonify
 from flask import jsonify, request
 from sqlalchemy import func
@@ -10,21 +11,36 @@ import re
 PLATE_NUMBER_PATTERN = re.compile(r'^[\u4e00-\u9fa5][A-Z][A-Z0-9]{5}$')
 
 
+# 定义有效的租赁状态
+VALID_RENTAL_STATUS = ['进行中', '已完成', '已逾期', '已取消']
+
+
 @bp.route('/api/vehicles', methods=['GET'])
-def get_vehicles_and_rantal_info():
-    # 连表查询车辆及其租赁状态
+def get_vehicles_and_rental_info():
+    # 查询车辆及其最新的租赁状态
+    subquery = (
+        db.session.query(
+            Rental.vehicle_id,
+            func.max(Rental.created_at).label('latest_created_at')
+        )
+        .group_by(Rental.vehicle_id)
+        .subquery()
+    )
+
     vehicles = (
         db.session.query(Vehicle, Rental.status)
-        .join(Rental, Vehicle.vehicle_id == Rental.vehicle_id, isouter=True)
+        .join(subquery, Vehicle.vehicle_id == subquery.c.vehicle_id, isouter=True)
+        .join(Rental, (Vehicle.vehicle_id == Rental.vehicle_id) & (Rental.created_at == subquery.c.latest_created_at), isouter=True)
         .filter(Vehicle.is_deleted == False)
         .order_by(Vehicle.vehicle_id.asc())
-        .all())
+        .all()
+    )
 
     result = {
         'data': [
             {
                 **vehicle.to_dict(),
-                'status': '忙碌中' if status == '进行中' or status == '已逾期' else '可租用'
+                'status': '忙碌中' if status in ['进行中', '已逾期'] else '可租用'
             }
             for vehicle, status in vehicles
         ],

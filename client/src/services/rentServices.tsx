@@ -105,3 +105,22 @@ export const cancelRental = async (rental_id: number) => {
     throw error;
   }
 };
+
+export const returnRental = async (rental_id: number) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/rentals/${rental_id}`,
+      {
+        method: "PATCH",
+      }
+    );
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error);
+    }
+    message.success("租赁归还成功");
+  } catch (error: any) {
+    message.error("租赁归还失败：" + error.message);
+    throw error;
+  }
+};
