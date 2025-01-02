@@ -4,7 +4,7 @@ from app.models import Customer, Rental, Users
 from app import db
 
 
-@bp.route('/api/customers', methods=['GET'])
+@bp.route('/api/customers/all', methods=['GET'])
 def get_customers():
     # 联表查询 Customer 和 User
     customers = (
@@ -36,6 +36,22 @@ def get_customer_by_id(customer_id):
         return jsonify({'error': 'Customer not found'}), 404
 
     return jsonify(customer.to_dict())
+
+
+@bp.route('/api/customers', methods=['GET'])
+def search_customers():
+    search_text = request.args.get('search', '').strip()
+    if not search_text:
+        return jsonify([])
+
+    customers = (
+        Customer.query.filter(
+            (Customer.name.ilike(f'%{search_text}%')) |
+            (Customer.id_card.ilike(f'%{search_text}%'))
+        )
+        .all()
+    )
+    return jsonify([customer.to_dict() for customer in customers])
 
 
 @bp.route('/api/customers/<int:customer_id>', methods=['DELETE'])

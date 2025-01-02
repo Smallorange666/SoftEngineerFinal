@@ -235,21 +235,21 @@ const CustomerPage: React.FC<User> = ({ user }) => {
         <Space>
           <Button
             type="link"
-            onClick={async () => {
-              await deleteCustomer(record.customer_id);
-              fetchData(); // 删除成功后重新加载数据
-            }}
-          >
-            删除
-          </Button>
-          <Button
-            type="link"
             onClick={() => {
               showUpdateProfileModal();
               setSelectedCustomerID(record.customer_id);
             }}
           >
             更新信息
+          </Button>
+          <Button
+            type="link"
+            onClick={async () => {
+              await deleteCustomer(record.customer_id);
+              fetchData(); // 删除成功后重新加载数据
+            }}
+          >
+            删除
           </Button>
         </Space>
       ),

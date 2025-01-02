@@ -6,12 +6,10 @@ import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import AddVehicleModal from "../modals/AddVehiclesModal";
 import { VehicleInfo, User } from "../types";
-import UpdateVehicleModal from "../modals/UpdateVehicleModal.tsx";
-import RentalModal from "../modals/RentalModal";
-import {
-  fetchAllVehicles,
-  deleteVehicle,
-} from "../services/vehicleServices.tsx"; // 导入服务函数
+import UpdateVehicleModal from "../modals/UpdateVehicleModal";
+import CustomerRentalModal from "../modals/CustomerRentalModal";
+import { fetchAllVehicles, deleteVehicle } from "../services/vehicleServices"; // 导入服务函数
+import AdminRentalModal from "../modals/AdminRentalModal";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -38,7 +36,9 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
   const searchInput = useRef<any>(null);
 
   const [isAddVehicleModalOpen, setIsAddVehicleModalOpen] = useState(false);
-  const [isRentModalOpen, setIsRentModalOpen] = useState(false);
+  const [isCustomerRentalModalOpen, setIsCustomerRentalModalOpen] =
+    useState(false);
+  const [isAdminRentalModalOpen, setIsAdminRentalModalOpen] = useState(false);
   const [isUpdateVehicleModalOpen, setIsUpdateVehicleModalOpen] =
     useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(
@@ -55,12 +55,20 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
     setIsAddVehicleModalOpen(false);
   };
 
-  const showRentalModal = () => {
-    setIsRentModalOpen(true);
+  const showCustomerRentalModal = () => {
+    setIsCustomerRentalModalOpen(true);
   };
 
-  const cancelRentalModal = () => {
-    setIsRentModalOpen(false);
+  const cancelCustomerRentalModal = () => {
+    setIsCustomerRentalModalOpen(false);
+  };
+
+  const showAdminRentalModal = () => {
+    setIsAdminRentalModalOpen(true);
+  };
+
+  const cancelAdminRentalModal = () => {
+    setIsAdminRentalModalOpen(false);
   };
 
   const showUpdateVehicleModal = () => {
@@ -256,17 +264,6 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
           {user?.role === "admin" && (
             <Button
               type="link"
-              onClick={async () => {
-                await deleteVehicle(record.vehicle_id);
-                fetchData();
-              }}
-            >
-              删除
-            </Button>
-          )}
-          {user?.role === "admin" && (
-            <Button
-              type="link"
               onClick={() => {
                 setSelectedVehicleId(record.vehicle_id);
                 showUpdateVehicleModal();
@@ -275,15 +272,39 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
               更新信息
             </Button>
           )}
-          {user?.role === "customer" && record.status === "可租用" && (
+
+          {record.status === "可租用" &&
+            (user?.role === "admin" ? (
+              <Button
+                type="link"
+                onClick={() => {
+                  setSelectedVehicleId(record.vehicle_id);
+                  showAdminRentalModal();
+                }}
+              >
+                创建租赁
+              </Button>
+            ) : (
+              <Button
+                type="link"
+                onClick={() => {
+                  setSelectedVehicleId(record.vehicle_id);
+                  showCustomerRentalModal();
+                }}
+              >
+                租赁
+              </Button>
+            ))}
+
+          {user?.role === "admin" && (
             <Button
               type="link"
-              onClick={() => {
-                setSelectedVehicleId(record.vehicle_id);
-                showRentalModal();
+              onClick={async () => {
+                await deleteVehicle(record.vehicle_id);
+                fetchData();
               }}
             >
-              租赁
+              删除
             </Button>
           )}
         </Space>
@@ -358,11 +379,18 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
         onUpdateSuccess={fetchData}
       />
 
-      <RentalModal
+      <CustomerRentalModal
         vehicle_id={selectedVehicleId as number}
         customer_id={user.customer_id}
-        open={isRentModalOpen}
-        onCancel={cancelRentalModal}
+        open={isCustomerRentalModalOpen}
+        onCancel={cancelCustomerRentalModal}
+        onRentSuccess={fetchData}
+      />
+
+      <AdminRentalModal
+        vehicle_id={selectedVehicleId as number}
+        open={isAdminRentalModalOpen}
+        onCancel={cancelAdminRentalModal}
         onRentSuccess={fetchData}
       />
     </div>

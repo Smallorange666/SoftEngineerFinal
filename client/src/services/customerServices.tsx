@@ -5,7 +5,7 @@ const API_BASE_URL = "http://localhost:5000/api";
 // 获取客户列表
 export const fetchAllCustomers = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/customers`);
+    const response = await fetch(`${API_BASE_URL}/customers/all`);
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error);
@@ -30,6 +30,22 @@ export const fetchCustomerByID = async (customer_id: number) => {
     return data;
   } catch (error: any) {
     message.error("获取客户信息失败：" + error.message);
+    throw error;
+  }
+};
+
+export const searchCustomers = async (searchText: string) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/customers?search=${searchText}`
+    );
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error searching customers:", error);
     throw error;
   }
 };

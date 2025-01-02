@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, Form, Input, InputNumber, message } from "antd";
 import type { AddVehicleModalProps } from "../types.ts";
-import { createVehicle } from "../services/vehicleServices.tsx";
+import { createVehicle } from "../services/vehicleServices";
 
 const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
   open,

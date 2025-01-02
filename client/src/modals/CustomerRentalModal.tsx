@@ -1,10 +1,10 @@
 import React from "react";
 import { Modal, Form, DatePicker, message } from "antd";
-import type { RentalModalProps } from "../types";
+import type { CustomerRentalModalProps } from "../types";
 import dayjs from "dayjs";
 import { createRental } from "../services/rentServices";
 
-const RentModal: React.FC<RentalModalProps> = ({
+const CustomerRentalModal: React.FC<CustomerRentalModalProps> = ({
   customer_id,
   vehicle_id,
   open,
@@ -69,4 +69,4 @@ const RentModal: React.FC<RentalModalProps> = ({
   );
 };
 
-export default RentModal;
+export default CustomerRentalModal;

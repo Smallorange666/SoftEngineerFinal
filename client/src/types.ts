@@ -38,12 +38,15 @@ export interface AddVehicleModalProps {
   onAddSuccess: () => void; // 添加成功回调
 }
 
-export interface RentalModalProps {
-  customer_id: number; // 用户 ID
+export interface AdminRentalModalProps {
   vehicle_id: number; // 车辆 ID
   open: boolean; // 控制 Modal 显示
   onCancel: () => void; // 关闭 Modal
   onRentSuccess: () => void; // 租赁成功回调
+}
+
+export interface CustomerRentalModalProps extends AdminRentalModalProps {
+  customer_id: number; // 用户 ID
 }
 
 export interface PersonalRentalInfo {

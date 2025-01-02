@@ -12,17 +12,17 @@ import {
 import type { MenuProps } from "antd";
 import { Layout, Menu, theme, Button, Dropdown, message } from "antd";
 import { useNavigate } from "react-router-dom";
-import VehiclePage from "./subpages/VehiclesPage.tsx";
-import MyRentalPage from "./subpages/MyRentalPage.tsx";
-import UpdateProfileModal from "./modals/UpdateProfileModal.tsx"; // 引入 UpdateProfileModal
+import VehiclePage from "./subpages/VehiclesPage";
+import MyRentalPage from "./subpages/MyRentalPage";
+import UpdateProfileModal from "./modals/UpdateProfileModal"; // 引入 UpdateProfileModal
 import { AppProps } from "./types.ts";
-import CustomerPage from "./subpages/CustomerPage.tsx";
-import ModifyPasswordModal from "./modals/ModifyPasswordModal.tsx";
-import DeleteAccountModal from "./modals/DeleteAccountModal.tsx";
-import OngoingRentalPage from "./subpages/OngoingRentalPage.tsx";
-import FinishedRentalPage from "./subpages/FinishedRentalPage.tsx";
-import OverdueRentalPage from "./subpages/OverdueRentalPage.tsx";
-import CanceledRentalPage from "./subpages/CanceledRentalPage.tsx";
+import CustomerPage from "./subpages/CustomerPage";
+import ModifyPasswordModal from "./modals/ModifyPasswordModal";
+import DeleteAccountModal from "./modals/DeleteAccountModal";
+import OngoingRentalPage from "./subpages/OngoingRentalPage";
+import FinishedRentalPage from "./subpages/FinishedRentalPage";
+import OverdueRentalPage from "./subpages/OverdueRentalPage";
+import CanceledRentalPage from "./subpages/CanceledRentalPage";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -74,11 +74,12 @@ const getMenuItems = (role: string): MenuItem[] => {
 const headerStyle: React.CSSProperties = {
   textAlign: "left",
   color: "#fff",
-  height: 64,
-  paddingInline: 48,
+  height: 80,
   lineHeight: "64px",
-  backgroundColor: "#4096ff",
-  fontSize: 20,
+  backgroundColor: "#0958d9", // 深蓝色
+  fontSize: 27,
+  fontFamily: "sans-serif",
+  fontWeight: 550,
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
@@ -209,8 +210,7 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
             />
           </Sider>
           <Layout>
-            <Header style={{ padding: 0, background: colorBgContainer }} />
-            <Content style={{ margin: "0 16px" }}>
+            <Content style={{ margin: "0 16px 16px 16px" }}>
               <div
                 style={{
                   padding: 24,
@@ -223,7 +223,7 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
               </div>
             </Content>
             <Footer style={{ textAlign: "center" }}>
-              Ant Design ©{new Date().getFullYear()} Created by Ant UED
+              Ant Design ©{new Date().getFullYear()} Created by Matrix & SCC
             </Footer>
           </Layout>
         </Layout>
