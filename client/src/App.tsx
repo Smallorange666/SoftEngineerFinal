@@ -20,6 +20,9 @@ import CustomerPage from "./subpages/CustomerPage.tsx";
 import ModifyPasswordModal from "./modals/ModifyPasswordModal.tsx";
 import DeleteAccountModal from "./modals/DeleteAccountModal.tsx";
 import OngoingRentalPage from "./subpages/OngoingRentalPage.tsx";
+import FinishedRentalPage from "./subpages/FinishedRentalPage.tsx";
+import OverdueRentalPage from "./subpages/OverdueRentalPage.tsx";
+import CanceledRentalPage from "./subpages/CanceledRentalPage.tsx";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -52,6 +55,7 @@ const adminSidebarItems: MenuItem[] = [
     getItem("进行中", "3"),
     getItem("已逾期", "4"),
     getItem("已完成", "5"),
+    getItem("已取消", "6"),
   ]),
 ];
 
@@ -153,9 +157,13 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
           <MyRentalPage user={user} />
         );
       case "3":
-        return <OngoingRentalPage user={user} />;
+        return <OngoingRentalPage />;
       case "4":
-        return user?.role === "admin" ? <div>已结束的租赁</div> : null;
+        return <OverdueRentalPage />;
+      case "5":
+        return <FinishedRentalPage />;
+      case "6":
+        return <CanceledRentalPage />;
       default:
         return <div>请选择一个菜单项</div>;
     }

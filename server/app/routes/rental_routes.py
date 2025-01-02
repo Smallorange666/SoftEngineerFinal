@@ -7,7 +7,7 @@ from app import db
 from datetime import datetime, timedelta
 
 # 定义有效的租赁状态
-VALID_RENTAL_STATUS = ['进行中', '已完成', '已逾期']
+VALID_RENTAL_STATUS = ['进行中', '已完成', '已逾期', '已取消']
 
 
 def check_and_update_rental_status():
@@ -50,6 +50,7 @@ def get_ongoing_rentals():
                          Customer.phone, Vehicle.plate_number)
         .join(Customer, Rental.customer_id == Customer.customer_id, isouter=True)
         .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id, isouter=True)
+        .filter(Rental.status == '进行中')
         .all()
     )
 
@@ -63,6 +64,99 @@ def get_ongoing_rentals():
                 'phone': phone,
                 'total_fee': rental.total_fee,
                 'expected_return_time': rental.expected_return_time.strftime('%Y-%m-%d %H:%M:%S') if rental.expected_return_time else None,
+            }
+            for rental, name, phone, plate_number in rentals
+        ],
+        'total': len(rentals)
+    }
+
+    return jsonify(result)
+
+
+@bp.route('/api/rentals/overdue', methods=['GET'])
+def get_overdue_rentals():
+    # 联表查询 Rental、Customer 和 Vehicle
+    rentals = (
+        db.session.query(Rental, Customer.name,
+                         Customer.phone, Vehicle.plate_number)
+        .join(Customer, Rental.customer_id == Customer.customer_id, isouter=True)
+        .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id, isouter=True)
+        .filter(Rental.status == '已逾期')
+        .all()
+    )
+
+    # 构造返回数据
+    result = {
+        'data': [
+            {
+                'rental_id': rental.rental_id,
+                'plate_number': plate_number,
+                'name': name,
+                'phone': phone,
+                'total_fee': rental.total_fee,
+                'expected_return_time': rental.expected_return_time.strftime('%Y-%m-%d %H:%M:%S') if rental.expected_return_time else None,
+            }
+            for rental, name, phone, plate_number in rentals
+        ],
+        'total': len(rentals)
+    }
+
+    return jsonify(result)
+
+
+@bp.route('/api/rentals/finished', methods=['GET'])
+def get_finished_rentals():
+    # 联表查询 Rental、Customer 和 Vehicle
+    rentals = (
+        db.session.query(Rental, Customer.name,
+                         Customer.phone, Vehicle.plate_number)
+        .join(Customer, Rental.customer_id == Customer.customer_id, isouter=True)
+        .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id, isouter=True)
+        .filter(Rental.status == '已完成')
+        .all()
+    )
+
+    # 构造返回数据
+    result = {
+        'data': [
+            {
+                'rental_id': rental.rental_id,
+                'plate_number': plate_number,
+                'name': name,
+                'phone': phone,
+                'total_fee': rental.total_fee,
+                'actual_return_time': rental.actual_return_time.strftime('%Y-%m-%d %H:%M:%S') if rental.actual_return_time else None,
+            }
+            for rental, name, phone, plate_number in rentals
+        ],
+        'total': len(rentals)
+    }
+
+    return jsonify(result)
+
+
+@bp.route('/api/rentals/canceled', methods=['GET'])
+def get_canceled_rentals():
+    # 联表查询 Rental、Customer 和 Vehicle
+    rentals = (
+        db.session.query(Rental, Customer.name,
+                         Customer.phone, Vehicle.plate_number)
+        .join(Customer, Rental.customer_id == Customer.customer_id, isouter=True)
+        .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id, isouter=True)
+        .filter(Rental.status == '已取消')
+        .all()
+    )
+
+    # 构造返回数据
+    result = {
+        'data': [
+            {
+                'rental_id': rental.rental_id,
+                'plate_number': plate_number,
+                'name': name,
+                'phone': phone,
+                'total_fee': rental.total_fee,
+                'actual_return_time': rental.actual_return_time.strftime('%Y-%m-%d %H:%M:%S') if rental.actual_return_time else None,
             }
             for rental, name, phone, plate_number in rentals
         ],
@@ -241,6 +335,24 @@ def update_rental(id):
                 except ValueError:
                     return jsonify({'error': 'Invalid duration days format'}), 400
 
+        db.session.commit()
+        return jsonify(rental.to_dict())
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
+
+
+@ bp.route('/api/rentals/<int:id>', methods=['DELETE'])
+def cancel_rental(id):
+    rental = Rental.query.get_or_404(id)
+
+    try:
+        # 只有进行中的租赁才能取消
+        if rental.status != '进行中':
+            return jsonify({'error': 'Only ongoing rental can be cancelled'}), 400
+
+        # 更新租赁状态为 '已取消'
+        rental.status = '已取消'
         db.session.commit()
         return jsonify(rental.to_dict())
     except Exception as e:

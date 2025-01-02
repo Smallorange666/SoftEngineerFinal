@@ -4,9 +4,8 @@ import { Table, Input, Button, Space } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import { OngoningRentalInfo } from "../types";
-import { fetchOngoingRental } from "../services/rentServices";
-import CancelRentalModal from "../modals/CancelRentalModal";
+import { FinishedRentalInfo } from "../types";
+import { fetchFinishedRental } from "../services/rentServices";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -18,9 +17,9 @@ interface TableParams {
   pagination?: TablePaginationConfig;
 }
 
-const OngoingRentalPage: React.FC = () => {
-  const [data, setData] = useState<OngoningRentalInfo[]>([]);
-  const [filteredData, setFilteredData] = useState<OngoningRentalInfo[]>([]);
+const FinishedRentalPage: React.FC = () => {
+  const [data, setData] = useState<FinishedRentalInfo[]>([]);
+  const [filteredData, setFilteredData] = useState<FinishedRentalInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
@@ -32,22 +31,11 @@ const OngoingRentalPage: React.FC = () => {
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef<any>(null);
 
-  const [selectedRentalId, setSelectedRentalId] = useState<number | null>(null);
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-
-  const showCancelModal = () => {
-    setIsCancelModalOpen(true);
-  };
-
-  const cancelCancelModal = () => {
-    setIsCancelModalOpen(false);
-  };
-
   // 搜索逻辑
   const handleSearch = (
     selectedKeys: string[],
     confirm: FilterDropdownProps["confirm"],
-    dataIndex: keyof OngoningRentalInfo
+    dataIndex: keyof FinishedRentalInfo
   ) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -85,8 +73,8 @@ const OngoingRentalPage: React.FC = () => {
   };
 
   const getColumnSearchProps = (
-    dataIndex: keyof OngoningRentalInfo
-  ): Exclude<TableProps<OngoningRentalInfo>["columns"], undefined>[number] => ({
+    dataIndex: keyof FinishedRentalInfo
+  ): Exclude<TableProps<FinishedRentalInfo>["columns"], undefined>[number] => ({
     filterDropdown: ({
       setSelectedKeys,
       selectedKeys,
@@ -171,7 +159,7 @@ const OngoingRentalPage: React.FC = () => {
   });
 
   // 列定义
-  const columns: ColumnsType<OngoningRentalInfo> = [
+  const columns: ColumnsType<FinishedRentalInfo> = [
     {
       title: "ID",
       dataIndex: "rental_id",
@@ -201,27 +189,9 @@ const OngoingRentalPage: React.FC = () => {
       ...getColumnSearchProps("total_fee"),
     },
     {
-      title: "预计归还时间",
-      dataIndex: "expected_return_time",
+      title: "实际归还时间",
+      dataIndex: "actual_return_time",
       width: "15%",
-    },
-    {
-      title: "操作",
-      key: "action",
-      width: "20%",
-      render: (_, record) => (
-        <Space size="middle">
-          <Button
-            type="link"
-            onClick={() => {
-              setSelectedRentalId(record.rental_id);
-              showCancelModal();
-            }}
-          >
-            取消租赁
-          </Button>
-        </Space>
-      ),
     },
   ];
 
@@ -229,14 +199,14 @@ const OngoingRentalPage: React.FC = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const vehicles = await fetchOngoingRental(); // 调用服务函数
-      setData(vehicles);
-      setFilteredData(vehicles); // 初始化筛选数据
+      const rentals = await fetchFinishedRental(); // 调用服务函数
+      setData(rentals);
+      setFilteredData(rentals); // 初始化筛选数据
       setLoading(false);
       setTableParams({
         pagination: {
           ...tableParams.pagination,
-          total: vehicles.length, // 更新总数
+          total: rentals.length, // 更新总数
         },
       });
     } catch (error) {
@@ -249,7 +219,7 @@ const OngoingRentalPage: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleTableChange: TableProps<OngoningRentalInfo>["onChange"] = (
+  const handleTableChange: TableProps<FinishedRentalInfo>["onChange"] = (
     pagination
   ) => {
     setTableParams({
@@ -259,7 +229,7 @@ const OngoingRentalPage: React.FC = () => {
 
   return (
     <div>
-      <Table<OngoningRentalInfo>
+      <Table<FinishedRentalInfo>
         columns={columns}
         rowKey={(record) => record.rental_id.toString()}
         dataSource={filteredData} // 使用筛选后的数据
@@ -267,18 +237,8 @@ const OngoingRentalPage: React.FC = () => {
         loading={loading}
         onChange={handleTableChange}
       />
-
-      <CancelRentalModal
-        rental_id={selectedRentalId as number}
-        open={isCancelModalOpen}
-        onCancel={cancelCancelModal}
-        onCancelSuccess={async () => {
-          await fetchData();
-          cancelCancelModal();
-        }}
-      />
     </div>
   );
 };
 
-export default OngoingRentalPage;
+export default FinishedRentalPage;

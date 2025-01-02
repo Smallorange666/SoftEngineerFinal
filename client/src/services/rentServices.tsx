@@ -17,6 +17,51 @@ export const fetchOngoingRental = async () => {
   }
 };
 
+export const fetchOverdueRental = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/rentals/overdue`);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error);
+    }
+    const data = await response.json();
+    return data.data;
+  } catch (error: any) {
+    message.error("获取逾期租赁信息失败：" + error.message);
+    throw error;
+  }
+};
+
+export const fetchFinishedRental = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/rentals/finished`);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error);
+    }
+    const data = await response.json();
+    return data.data;
+  } catch (error: any) {
+    message.error("获取已完成租赁信息失败：" + error.message);
+    throw error;
+  }
+};
+
+export const fetchCanceledRental = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/rentals/canceled`);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error);
+    }
+    const data = await response.json();
+    return data.data;
+  } catch (error: any) {
+    message.error("获取已取消租赁信息失败：" + error.message);
+    throw error;
+  }
+};
+
 export const createRental = async (
   customer_id: number,
   vehicle_id: number,
@@ -41,6 +86,22 @@ export const createRental = async (
     message.success("租赁创建成功");
   } catch (error: any) {
     message.error("租赁创建失败：" + error.message);
+    throw error;
+  }
+};
+
+export const cancelRental = async (rental_id: number) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/rentals/${rental_id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error);
+    }
+    message.success("租赁取消成功");
+  } catch (error: any) {
+    message.error("租赁取消失败：" + error.message);
     throw error;
   }
 };

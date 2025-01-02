@@ -21,6 +21,13 @@ export interface Vehicle {
   price_per_day: number;
 }
 
+export interface CancelRentalModalProps {
+  rental_id: number;
+  open: boolean;
+  onCancel: () => void;
+  onCancelSuccess: () => void;
+}
+
 export interface VehicleInfo extends Vehicle {
   status: string; // 添加状态字段
 }
@@ -56,14 +63,25 @@ export interface PersonalRentalInfo {
   price_per_day: number;
 }
 
-export interface OngoningRentalInfo {
+export interface BaseRentalInfo {
   rental_id: number;
   plate_number: string;
   name: string;
-  phong: string;
+  phone: string;
   total_fee: number;
+}
+
+export interface OngoningRentalInfo extends BaseRentalInfo {
   expected_return_time: string;
 }
+
+export interface OverdueRentalInfo extends OngoningRentalInfo {}
+
+export interface FinishedRentalInfo extends BaseRentalInfo {
+  actual_return_time: string;
+}
+
+export interface CanceledRentalInfo extends BaseRentalInfo {}
 
 export interface AddCustomerModalProps {
   open: boolean; // 控制模态框显示
