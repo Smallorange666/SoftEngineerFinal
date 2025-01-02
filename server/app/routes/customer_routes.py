@@ -55,10 +55,23 @@ def delete_customer(customer_id):
 
 @ bp.route('/api/customers/<int:customer_id>', methods=['PUT'])
 def update_customer(customer_id):
-    customer = Customer.query.get_or_404(customer_id)
-    data = request.get_json()
+    customer = Customer.query.filter_by(
+        customer_id=customer_id).filter_by(is_deleted=False).first()
+    if customer is None:
+        return jsonify({'error': 'Customer not found'}), 404
+
+    user = Users.query.get(customer.user_id)
+    if user is None:
+        return jsonify({'error': 'User not found'}), 404
 
     try:
+        data = request.get_json()
+
+        if 'username' in data:
+            if not data['username'].strip():
+                return jsonify({'error': 'Username cannot be empty'}), 400
+            user.username = data['username']
+
         # 更新基本信息
         if 'name' in data:
             customer.name = data['name']

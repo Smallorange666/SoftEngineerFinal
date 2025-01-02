@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, InputNumber, message } from "antd";
-import { fetchVehicleById, updateVehicle } from "../services/vehicleServices"; // 导入服务函数
+import { fetchVehicleByID, updateVehicle } from "../services/vehicleServices"; // 导入服务函数
 import { UpdateVehicleModalProps } from "../types";
 
 const UpdateVehicleModal: React.FC<UpdateVehicleModalProps> = ({
@@ -20,7 +20,7 @@ const UpdateVehicleModal: React.FC<UpdateVehicleModalProps> = ({
     setLoading(true);
     try {
       if (vehicle_id !== null) {
-        const vehicleData = await fetchVehicleById(vehicle_id);
+        const vehicleData = await fetchVehicleByID(vehicle_id);
         form.setFieldsValue(vehicleData);
       }
     } catch (error: any) {

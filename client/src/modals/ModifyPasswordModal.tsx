@@ -1,9 +1,9 @@
 import React from "react";
 import { Modal, Form, Input, Button } from "antd";
-import { ModifyAccountModalProps } from "../types";
-import { modifyAccount } from "../services/userServices";
+import { ModifyPasswordModalProps } from "../types";
+import { modifyPassword } from "../services/userServices";
 
-const ModifyAccountModal: React.FC<ModifyAccountModalProps> = ({
+const ModifyPasswordModal: React.FC<ModifyPasswordModalProps> = ({
   user,
   visible,
   onCancel,
@@ -14,7 +14,7 @@ const ModifyAccountModal: React.FC<ModifyAccountModalProps> = ({
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      await modifyAccount(user.user_id, values); // 调用父组件传递的回调函数
+      await modifyPassword(user.user_id, values); // 调用父组件传递的回调函数
       form.resetFields(); // 重置表单
       onCancel(); // 关闭模态框
       onModifySuccess(); // 修改成功的回调
@@ -42,17 +42,6 @@ const ModifyAccountModal: React.FC<ModifyAccountModalProps> = ({
         layout="vertical"
         initialValues={{ username: user.username }}
       >
-        <Form.Item
-          label="用户名"
-          name="username"
-          rules={[
-            { required: false, message: "请输入用户名" },
-            { min: 3, message: "用户名至少 3 个字符" },
-            { max: 20, message: "用户名最多 20 个字符" },
-          ]}
-        >
-          <Input placeholder="用户名" />
-        </Form.Item>
         <Form.Item
           label="旧密码"
           name="oldPassword"
@@ -92,4 +81,4 @@ const ModifyAccountModal: React.FC<ModifyAccountModalProps> = ({
   );
 };
 
-export default ModifyAccountModal;
+export default ModifyPasswordModal;

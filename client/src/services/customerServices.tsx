@@ -8,7 +8,7 @@ export const fetchAllCustomers = async () => {
     const response = await fetch(`${API_BASE_URL}/customers`);
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || "获取客户列表失败");
+      throw new Error(errorData.error);
     }
     const data = await response.json();
     return data.data;
@@ -19,7 +19,7 @@ export const fetchAllCustomers = async () => {
 };
 
 // 根据 ID 获取客户信息
-export const fetchCustomerById = async (customer_id: number) => {
+export const fetchCustomerByID = async (customer_id: number) => {
   try {
     const response = await fetch(`${API_BASE_URL}/customers/${customer_id}`);
     if (!response.ok) {
@@ -42,7 +42,7 @@ export const deleteCustomer = async (customer_id: number) => {
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || "删除客户失败");
+      throw new Error(errorData.error);
     }
     message.success("客户删除成功");
   } catch (error: any) {
@@ -63,7 +63,7 @@ export const createCustomer = async (values: any) => {
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || "创建客户失败");
+      throw new Error(errorData.error);
     }
     message.success("客户创建成功");
   } catch (error: any) {
@@ -84,11 +84,10 @@ export const updateCustomer = async (customer_id: number, values: any) => {
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || "更新客户信息失败");
+      throw new Error(errorData.error);
     }
-    message.success("客户信息更新成功");
   } catch (error: any) {
-    message.error("更新客户信息失败：" + error.message);
+    message.error("更新信息失败：" + error.message);
     throw error;
   }
 };

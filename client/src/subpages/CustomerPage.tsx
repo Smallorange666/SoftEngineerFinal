@@ -321,6 +321,7 @@ const CustomerPage: React.FC<User> = ({ user }) => {
       />
 
       <UpdateProfileModal
+        user={user}
         customer_id={selectedCustomerID as number}
         visible={isUpdateProfileModalOpen}
         onCancel={cancelUpdateProfileModal}

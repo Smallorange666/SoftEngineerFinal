@@ -15,7 +15,7 @@ import {
   rentVehicle,
 } from "../services/vehicleServices.tsx"; // 导入服务函数
 
-import { fetchCustomerById } from "../services/customerServices.tsx";
+import { fetchCustomerByID } from "../services/customerServices.tsx";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -321,7 +321,7 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
     }
 
     try {
-      const customerInfo = await fetchCustomerById(user.user_id); // 获取客户信息
+      const customerInfo = await fetchCustomerByID(user.user_id); // 获取客户信息
       const customerId = customerInfo.customer_id;
 
       if (!customerId) {

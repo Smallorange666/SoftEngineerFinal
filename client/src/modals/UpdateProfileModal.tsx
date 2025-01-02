@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, message } from "antd";
 import type { UpdateProfileModalProps } from "../types";
 import {
-  fetchCustomerById,
+  fetchCustomerByID,
   updateCustomer,
 } from "../services/customerServices"; // 导入服务函数
 
 const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
+  user,
   customer_id,
   visible,
   onCancel,
@@ -19,7 +20,8 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
   const fillForm = async () => {
     setLoading(true);
     try {
-      fetchCustomerById(customer_id).then((data) => {
+      form.setFieldValue("username", user.username);
+      fetchCustomerByID(customer_id).then((data) => {
         form.setFieldsValue(data);
       });
     } catch (error: any) {
@@ -35,7 +37,11 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
     try {
       await updateCustomer(customer_id, values); // 调用服务函数
       onCancel(); // 关闭模态框
-      onUpdateProfileSuccess(); // 调用父组件传递的回调函数
+      if (user.username === values.username) {
+        onCancel();
+      } else {
+        onUpdateProfileSuccess(); // 调用父组件传递的回调函数
+      }
     } catch (error: any) {
       message.error("更新失败：" + error.message);
     } finally {
@@ -61,9 +67,24 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
     >
       <Form form={form} onFinish={handleSubmit} layout="vertical">
         <Form.Item
+          name="username"
+          label="用户名（修改后需要重新登录，建议先修改密码）"
+          rules={[
+            { required: true, message: "请输入用户名" },
+            { min: 3, message: "用户名至少 3 个字符" },
+            { max: 20, message: "用户名最多 20 个字符" },
+          ]}
+        >
+          <Input placeholder="请输入用户名" />
+        </Form.Item>
+        <Form.Item
           name="name"
           label="姓名"
-          rules={[{ required: true, message: "请输入姓名" }]}
+          rules={[
+            { required: true, message: "请输入姓名" },
+            { min: 1, message: "姓名至少 1 个字符" },
+            { max: 50, message: "姓名最多 50 个字符" },
+          ]}
         >
           <Input placeholder="请输入姓名" />
         </Form.Item>
@@ -87,7 +108,14 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
         >
           <Input placeholder="请输入身份证号" />
         </Form.Item>
-        <Form.Item name="address" label="地址">
+        <Form.Item
+          name="address"
+          label="地址"
+          rules={[
+            { required: false, message: "请输入地址" },
+            { max: 200, message: "地址最多 200 个字符" },
+          ]}
+        >
           <Input placeholder="请输入地址" />
         </Form.Item>
       </Form>

@@ -110,19 +110,16 @@ def login():
 
 
 @bp.route('/api/user/<int:user_id>', methods=['PUT'])
-def update_user(user_id):
+def modify_password(user_id):
     user = Users.query.get(user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
-    data = request.get_json()
 
     try:
         data = request.get_json()
-        user.username = data['username']
         password_hash = generate_password_hash(data['password'])
         user.password_hash = password_hash
-
         db.session.commit()
         return '', 204
     except Exception as e:

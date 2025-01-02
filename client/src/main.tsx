@@ -44,7 +44,7 @@ const Root: React.FC = () => {
 };
 
 // 使用 createRoot 渲染应用
-const container = document.getElementById("root");
+const container = document.getElementByID("root");
 if (container) {
   const root = createRoot(container);
   root.render(<Root />);

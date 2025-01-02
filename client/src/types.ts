@@ -60,7 +60,7 @@ export interface AddCustomerModalProps {
   onCreateSuccess: () => void; // 创建成功回调
 }
 
-export interface UpdateProfileModalProps {
+export interface UpdateProfileModalProps extends User {
   customer_id: number;
   visible: boolean;
   onCancel: () => void;
@@ -81,7 +81,7 @@ export interface CreateCustomerInfo extends CustomerInfo {
   role: string;
 }
 
-export interface ModifyAccountModalProps extends User {
+export interface ModifyPasswordModalProps extends User {
   visible: boolean; // 控制模态框显示/隐藏
   onCancel: () => void; // 关闭模态框的回调
   onModifySuccess: () => void; // 修改成功的回调

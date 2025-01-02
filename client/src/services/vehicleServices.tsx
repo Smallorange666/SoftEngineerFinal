@@ -18,7 +18,7 @@ export const fetchAllVehicles = async () => {
   }
 };
 
-export const fetchVehicleById = async (vehicle_id: number) => {
+export const fetchVehicleByID = async (vehicle_id: number) => {
   try {
     const response = await fetch(`${API_BASE_URL}/vehicles/${vehicle_id}`);
     if (!response.ok) {

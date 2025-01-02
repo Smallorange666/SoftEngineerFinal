@@ -17,7 +17,7 @@ import MyRentalPage from "./subpages/MyRentalPage.tsx";
 import UpdateProfileModal from "./modals/UpdateProfileModal.tsx"; // 引入 UpdateProfileModal
 import { AppProps } from "./types.ts";
 import CustomerPage from "./subpages/CustomerPage.tsx";
-import ModifyAccountModal from "./modals/ModifyAccountModal.tsx";
+import ModifyPasswordModal from "./modals/ModifyPasswordModal.tsx";
 import DeleteAccountModal from "./modals/DeleteAccountModal.tsx";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -83,8 +83,8 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("1"); // 默认选中车辆管理
   const [isProfileModalVisible, setIsProfileModalVisible] = useState(false); // 控制 UpdateProfileModal 显示/隐藏
-  const [isModifyAccountModalVisible, setIsModifyAccountModalVisible] =
-    useState(false); // 控制 ModifyAccountModal 显示/隐藏
+  const [isModifyPasswordModalVisible, setIsModifyPasswordModalVisible] =
+    useState(false); // 控制 ModifyPasswordModal 显示/隐藏
   const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] =
     useState(false); // 控制 DeleteAccountModal 显示/隐藏s
   const {
@@ -101,9 +101,9 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
     const commonItems = [
       {
         key: "change-password",
-        label: "修改账号密码",
+        label: "修改密码",
         icon: <LockOutlined />,
-        onClick: () => setIsModifyAccountModalVisible(true),
+        onClick: () => setIsModifyPasswordModalVisible(true),
       },
       {
         key: "logout",
@@ -121,7 +121,7 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
       return [
         {
           key: "edit-profile",
-          label: "更改个人信息",
+          label: "账号信息",
           icon: <SettingOutlined />,
           onClick: () => setIsProfileModalVisible(true),
         },
@@ -222,19 +222,22 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
 
       {/* UpdateProfileModal */}
       <UpdateProfileModal
+        user={user}
         customer_id={user.customer_id}
         visible={isProfileModalVisible}
         onCancel={() => setIsProfileModalVisible(false)}
         onUpdateProfileSuccess={() => {
-          setIsProfileModalVisible(false);
+          onLogout();
+          navigate("/login");
+          message.info("用户名已更新，请重新登录");
         }}
       />
 
-      {/* ModifyAccountModal */}
-      <ModifyAccountModal
+      {/* ModifyPasswordModal */}
+      <ModifyPasswordModal
         user={user}
-        visible={isModifyAccountModalVisible}
-        onCancel={() => setIsModifyAccountModalVisible(false)}
+        visible={isModifyPasswordModalVisible}
+        onCancel={() => setIsModifyPasswordModalVisible(false)}
         onModifySuccess={() => {
           onLogout();
           navigate("/login");
