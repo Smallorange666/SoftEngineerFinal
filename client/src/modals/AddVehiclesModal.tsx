@@ -1,19 +1,21 @@
 import React from "react";
 import { Modal, Form, Input, InputNumber, message } from "antd";
 import type { AddVehicleModalProps } from "../types.ts";
+import { createVehicle } from "../services/vehicleServices.tsx";
 
 const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
   open,
   onCancel,
-  onCreate,
+  onAddSuccess,
 }) => {
   const [form] = Form.useForm();
 
-  const handleOk = async () => {
+  const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      onCreate(values); // 调用父组件传递的 onCreate 方法
+      await createVehicle(values);
       form.resetFields(); // 重置表单
+      onAddSuccess(); // 调用父组件传递的回调函数
     } catch (error) {
       message.error("表单验证失败，请检查输入");
       console.error("Form validation failed:", error);
@@ -24,12 +26,12 @@ const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
     <Modal
       title="新增车辆"
       open={open}
-      onOk={handleOk}
+      onOk={() => form.submit()}
       onCancel={onCancel}
       okText="创建"
       cancelText="取消"
     >
-      <Form form={form} layout="vertical">
+      <Form form={form} onFinish={handleSubmit} layout="vertical">
         <Form.Item
           name="type"
           label="车辆类型"

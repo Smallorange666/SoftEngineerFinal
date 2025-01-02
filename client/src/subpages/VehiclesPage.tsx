@@ -267,7 +267,7 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
                 showUpdateVehicleModal();
               }}
             >
-              修改信息
+              更新信息
             </Button>
           )}
           {user?.role === "customer" && record.status === "可租用" && (
@@ -293,17 +293,6 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
       fetchData(); // 重新加载数据
     } catch (error) {
       console.error("Error deleting vehicle:", error);
-    }
-  };
-
-  // 创建车辆
-  const handleCreate = async (values: Omit<Vehicle, "vehicle_id">) => {
-    try {
-      await createVehicle(values); // 调用服务函数
-      fetchData(); // 重新加载数据
-      setIsAddVehicleModalOpen(false); // 关闭 Modal
-    } catch (error) {
-      console.error("Error creating vehicle:", error);
     }
   };
 
@@ -364,7 +353,7 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
       <AddVehicleModal
         open={isAddVehicleModalOpen}
         onCancel={cancelAddVehicleModal}
-        onCreate={handleCreate}
+        onAddSuccess={fetchData}
       />
 
       <UpdateVehicleModal

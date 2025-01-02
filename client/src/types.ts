@@ -28,7 +28,7 @@ export interface VehicleInfo extends Vehicle {
 export interface AddVehicleModalProps {
   open: boolean; // 控制 Modal 显示
   onCancel: () => void; // 关闭 Modal
-  onCreate: (values: Omit<Vehicle, "vehicle_id">) => void; // 提交表单
+  onAddSuccess: () => void; // 添加成功回调
 }
 
 export interface RentalModalProps {
