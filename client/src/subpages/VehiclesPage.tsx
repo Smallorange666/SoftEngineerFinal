@@ -1,17 +1,16 @@
 import React, { useEffect, useState, useRef } from "react";
 import type { GetProp, TableProps } from "antd";
-import { Table, Input, Button, Space, message } from "antd";
+import { Table, Input, Button, Space } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import AddVehicleModal from "../modals/AddVehiclesModal";
-import { Vehicle, VehicleInfo, User } from "../types";
+import { VehicleInfo, User } from "../types";
 import UpdateVehicleModal from "../modals/UpdateVehicleModal.tsx";
 import RentalModal from "../modals/RentalModal";
 import {
   fetchAllVehicles,
   deleteVehicle,
-  createVehicle,
 } from "../services/vehicleServices.tsx"; // 导入服务函数
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
@@ -255,7 +254,13 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
       render: (_, record) => (
         <Space>
           {user?.role === "admin" && (
-            <Button type="link" onClick={() => handleDelete(record.vehicle_id)}>
+            <Button
+              type="link"
+              onClick={async () => {
+                await deleteVehicle(record.vehicle_id);
+                fetchData();
+              }}
+            >
               删除
             </Button>
           )}
@@ -285,16 +290,6 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
       ),
     },
   ];
-
-  // 删除操作
-  const handleDelete = async (vehicle_id: number) => {
-    try {
-      await deleteVehicle(vehicle_id); // 调用服务函数
-      fetchData(); // 重新加载数据
-    } catch (error) {
-      console.error("Error deleting vehicle:", error);
-    }
-  };
 
   // 获取数据
   const fetchData = async () => {

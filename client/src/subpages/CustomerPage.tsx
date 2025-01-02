@@ -233,7 +233,13 @@ const CustomerPage: React.FC<User> = ({ user }) => {
       width: "10%",
       render: (_, record) => (
         <Space>
-          <Button type="link" onClick={() => handleDelete(record.customer_id)}>
+          <Button
+            type="link"
+            onClick={async () => {
+              await deleteCustomer(record.customer_id);
+              fetchData(); // 删除成功后重新加载数据
+            }}
+          >
             删除
           </Button>
           <Button
@@ -249,16 +255,6 @@ const CustomerPage: React.FC<User> = ({ user }) => {
       ),
     },
   ];
-
-  // 删除操作
-  const handleDelete = async (customerId: number) => {
-    try {
-      await deleteCustomer(customerId); // 调用服务函数
-      fetchData(); // 重新加载数据
-    } catch (error) {
-      console.error("Error deleting customer:", error);
-    }
-  };
 
   // 获取数据
   const fetchData = async () => {
