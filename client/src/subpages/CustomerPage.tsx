@@ -6,6 +6,7 @@ import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { User, CustomerInfo } from "../types";
 import AddCustomerModal from "../modals/AddCustomerModal";
+import UpdateProfileModal from "../modals/UpdateProfileModal";
 import {
   fetchAllCustomers,
   deleteCustomer,
@@ -33,9 +34,14 @@ const CustomerPage: React.FC<User> = ({ user }) => {
   });
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
+  const [selectedCustomerID, setSelectedCustomerID] = useState<number | null>(
+    null
+  );
   const searchInput = useRef<any>(null);
 
   const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
+  const [isUpdateProfileModalOpen, setIsUpdateProfileModalOpen] =
+    useState(false);
 
   // 打开新增用户浮层
   const showAddCustomerModal = () => {
@@ -45,6 +51,16 @@ const CustomerPage: React.FC<User> = ({ user }) => {
   // 关闭新增用户浮层
   const cancelAddCustomerModal = () => {
     setIsAddCustomerModalOpen(false);
+  };
+
+  // 打开更新用户信息浮层
+  const showUpdateProfileModal = () => {
+    setIsUpdateProfileModalOpen(true);
+  };
+
+  // 关闭更新用户信息浮层
+  const cancelUpdateProfileModal = () => {
+    setIsUpdateProfileModalOpen(false);
   };
 
   // 搜索逻辑
@@ -220,6 +236,15 @@ const CustomerPage: React.FC<User> = ({ user }) => {
           <Button type="link" onClick={() => handleDelete(record.customer_id)}>
             删除
           </Button>
+          <Button
+            type="link"
+            onClick={() => {
+              showUpdateProfileModal();
+              setSelectedCustomerID(record.customer_id);
+            }}
+          >
+            更新信息
+          </Button>
         </Space>
       ),
     },
@@ -293,6 +318,13 @@ const CustomerPage: React.FC<User> = ({ user }) => {
         visible={isAddCustomerModalOpen}
         onCancel={cancelAddCustomerModal}
         onCreateSuccess={fetchData} // 创建成功后重新加载数据
+      />
+
+      <UpdateProfileModal
+        customer_id={selectedCustomerID as number}
+        visible={isUpdateProfileModalOpen}
+        onCancel={cancelUpdateProfileModal}
+        onUpdateProfileSuccess={fetchData} // 更新成功后重新加载数据
       />
     </div>
   );

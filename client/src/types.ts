@@ -60,7 +60,8 @@ export interface AddCustomerModalProps {
   onCreateSuccess: () => void; // 创建成功回调
 }
 
-export interface UpdateProfileModalProps extends User {
+export interface UpdateProfileModalProps {
+  customer_id: number;
   visible: boolean;
   onCancel: () => void;
   onUpdateProfileSuccess: () => void;

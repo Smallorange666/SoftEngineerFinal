@@ -7,7 +7,7 @@ import {
 } from "../services/customerServices"; // 导入服务函数
 
 const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
-  user,
+  customer_id,
   visible,
   onCancel,
   onUpdateProfileSuccess,
@@ -19,7 +19,7 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
   const fillForm = async () => {
     setLoading(true);
     try {
-      fetchCustomerById(user.customer_id).then((data) => {
+      fetchCustomerById(customer_id).then((data) => {
         form.setFieldsValue(data);
       });
     } catch (error: any) {
@@ -33,7 +33,7 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
   const handleSubmit = async (values: any) => {
     setLoading(true);
     try {
-      await updateCustomer(user.customer_id, values); // 调用服务函数
+      await updateCustomer(customer_id, values); // 调用服务函数
       onCancel(); // 关闭模态框
       onUpdateProfileSuccess(); // 调用父组件传递的回调函数
     } catch (error: any) {
@@ -44,10 +44,10 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
   };
 
   useEffect(() => {
-    if (visible && user?.user_id) {
+    if (visible && customer_id) {
       fillForm();
     }
-  }, [visible, user?.user_id]);
+  }, [visible, customer_id]);
 
   return (
     <Modal

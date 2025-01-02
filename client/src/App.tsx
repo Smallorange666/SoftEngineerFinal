@@ -14,7 +14,7 @@ import { Layout, Menu, theme, Button, Dropdown, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import VehiclePage from "./subpages/VehiclesPage.tsx";
 import MyRentalPage from "./subpages/MyRentalPage.tsx";
-import ProfileModal from "./modals/ProfileModal.tsx"; // 引入 ProfileModal
+import UpdateProfileModal from "./modals/UpdateProfileModal.tsx"; // 引入 UpdateProfileModal
 import { AppProps } from "./types.ts";
 import CustomerPage from "./subpages/CustomerPage.tsx";
 import ModifyAccountModal from "./modals/ModifyAccountModal.tsx";
@@ -82,7 +82,7 @@ const headerStyle: React.CSSProperties = {
 const App: React.FC<AppProps> = ({ user, onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("1"); // 默认选中车辆管理
-  const [isProfileModalVisible, setIsProfileModalVisible] = useState(false); // 控制 ProfileModal 显示/隐藏
+  const [isProfileModalVisible, setIsProfileModalVisible] = useState(false); // 控制 UpdateProfileModal 显示/隐藏
   const [isModifyAccountModalVisible, setIsModifyAccountModalVisible] =
     useState(false); // 控制 ModifyAccountModal 显示/隐藏
   const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] =
@@ -220,9 +220,9 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
         </Layout>
       </Layout>
 
-      {/* ProfileModal */}
-      <ProfileModal
-        user={user}
+      {/* UpdateProfileModal */}
+      <UpdateProfileModal
+        customer_id={user.customer_id}
         visible={isProfileModalVisible}
         onCancel={() => setIsProfileModalVisible(false)}
         onUpdateProfileSuccess={() => {
