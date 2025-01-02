@@ -39,7 +39,7 @@ export interface RentalModalProps {
   onRentSuccess: () => void; // 租赁成功回调
 }
 
-export interface RentalInfo {
+export interface PersonalRentalInfo {
   rental_id: number;
   vehicle_id: number;
   customer_id: number;
@@ -54,6 +54,15 @@ export interface RentalInfo {
   model: string;
   color: string;
   price_per_day: number;
+}
+
+export interface OngoningRentalInfo {
+  rental_id: number;
+  plate_number: string;
+  name: string;
+  phong: string;
+  total_fee: number;
+  expected_return_time: string;
 }
 
 export interface AddCustomerModalProps {

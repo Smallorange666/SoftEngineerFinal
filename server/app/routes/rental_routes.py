@@ -33,13 +33,43 @@ def check_and_update_rental_status():
 
 
 @bp.route('/api/rentals', methods=['GET'])
-def get_rentals():
+def get_all_rentals():
     # 检查并更新租赁状态
     check_and_update_rental_status()
 
     # 获取所有租赁记录
     rentals = Rental.query.all()
     return jsonify([rental.to_dict() for rental in rentals])
+
+
+@bp.route('/api/rentals/ongoing', methods=['GET'])
+def get_ongoing_rentals():
+    # 联表查询 Rental、Customer 和 Vehicle
+    rentals = (
+        db.session.query(Rental, Customer.name,
+                         Customer.phone, Vehicle.plate_number)
+        .join(Customer, Rental.customer_id == Customer.customer_id, isouter=True)
+        .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id, isouter=True)
+        .all()
+    )
+
+    # 构造返回数据
+    result = {
+        'data': [
+            {
+                'rental_id': rental.rental_id,
+                'plate_number': plate_number,
+                'name': name,
+                'phone': phone,
+                'total_fee': rental.total_fee,
+                'expected_return_time': rental.expected_return_time.strftime('%Y-%m-%d %H:%M:%S') if rental.expected_return_time else None,
+            }
+            for rental, name, phone, plate_number in rentals
+        ],
+        'total': len(rentals)
+    }
+
+    return jsonify(result)
 
 
 @bp.route('/api/rentals/<int:id>', methods=['GET'])

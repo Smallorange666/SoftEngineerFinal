@@ -2,7 +2,7 @@ import React from "react";
 import { Modal, Form, DatePicker, message } from "antd";
 import type { RentalModalProps } from "../types";
 import dayjs from "dayjs";
-import { createRent } from "../services/rentServices";
+import { createRental } from "../services/rentServices";
 
 const RentModal: React.FC<RentalModalProps> = ({
   customer_id,
@@ -30,7 +30,7 @@ const RentModal: React.FC<RentalModalProps> = ({
         duration_days: durationDays,
       };
 
-      await createRent(customer_id, vehicle_id, rentalData); // 调用服务函数
+      await createRental(customer_id, vehicle_id, rentalData); // 调用服务函数
       form.resetFields(); // 重置表单
       onCancel(); // 关闭模态框
       onRentSuccess(); // 调用父组件传递的回调函数

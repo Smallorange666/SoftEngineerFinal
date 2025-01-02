@@ -19,6 +19,7 @@ import { AppProps } from "./types.ts";
 import CustomerPage from "./subpages/CustomerPage.tsx";
 import ModifyPasswordModal from "./modals/ModifyPasswordModal.tsx";
 import DeleteAccountModal from "./modals/DeleteAccountModal.tsx";
+import OngoingRentalPage from "./subpages/OngoingRentalPage.tsx";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -152,7 +153,7 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
           <MyRentalPage user={user} />
         );
       case "3":
-        return user?.role === "admin" ? <div>进行中的租赁</div> : null;
+        return <OngoingRentalPage user={user} />;
       case "4":
         return user?.role === "admin" ? <div>已结束的租赁</div> : null;
       default:
