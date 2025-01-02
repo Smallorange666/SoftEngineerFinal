@@ -1,4 +1,6 @@
+
 from flask import jsonify, request
+from sqlalchemy import or_
 from app.routes import bp
 from app.models import Rental, Vehicle, Customer
 from app import db
@@ -96,6 +98,8 @@ def get_customer_rentals(customer_id):
 
 @bp.route('/api/rentals', methods=['POST'])
 def create_rental():
+    check_and_update_rental_status()
+
     data = request.get_json()
 
     # 验证必需字段
@@ -104,8 +108,11 @@ def create_rental():
     if missing_fields:
         return jsonify({'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
 
-    # 检查用户本人是否存在逾期未还的租赁记录
+    vehicle_id = data['vehicle_id']
     customer_id = data['customer_id']
+    duration_days = int(data['duration_days'])
+
+    # 检查用户本人是否存在逾期未还的租赁记录
     overdue_rental = Rental.query.filter(
         Rental.customer_id == customer_id,
         Rental.status == '已逾期'
@@ -115,18 +122,22 @@ def create_rental():
 
     # 验证租赁天数
     try:
-        duration_days = int(data['duration_days'])
         if duration_days <= 0:
             return jsonify({'error': 'Duration days must be positive'}), 400
     except ValueError:
         return jsonify({'error': 'Invalid duration days format'}), 400
 
     # 检查车辆是否已被租赁
-    vehicle_id = data['vehicle_id']
-    ongoing_rental = Rental.query.filter(
-        Rental.vehicle_id == vehicle_id,
-        Rental.expected_return_time > datetime.now()
-    ).first()
+    ongoing_rental = (
+        Rental.query
+        .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id)  # 联表查询
+        .filter(
+            Rental.vehicle_id == vehicle_id,
+            Vehicle.is_deleted == False
+        ).filter(
+            or_(Rental.status == '进行中', Rental.status == '已逾期')
+        ).first()
+    )
     if ongoing_rental:
         return jsonify({'error': 'Vehicle is currently rented out'}), 400
 
@@ -136,11 +147,11 @@ def create_rental():
         vehicle = Vehicle.query.get(vehicle_id)
         if not vehicle:
             return jsonify({'error': 'Vehicle not found'}), 404
-        total_fee = float(vehicle.price_per_day) * duration_days
 
+        total_fee = float(vehicle.price_per_day) * duration_days
         rental = Rental(
             vehicle_id=vehicle_id,
-            customer_id=data['customer_id'],
+            customer_id=customer_id,
             start_time=start_time,
             duration_days=duration_days,
             expected_return_time=expected_return_time,
@@ -155,7 +166,7 @@ def create_rental():
         return jsonify({'error': str(e)}), 400
 
 
-@bp.route('/api/rentals/<int:id>', methods=['PUT'])
+@ bp.route('/api/rentals/<int:id>', methods=['PUT'])
 def update_rental(id):
     rental = Rental.query.get_or_404(id)
     data = request.get_json()

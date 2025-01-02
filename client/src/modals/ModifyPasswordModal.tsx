@@ -5,7 +5,7 @@ import { modifyPassword } from "../services/userServices";
 
 const ModifyPasswordModal: React.FC<ModifyPasswordModalProps> = ({
   user,
-  visible,
+  open,
   onCancel,
   onModifySuccess,
 }) => {
@@ -26,7 +26,7 @@ const ModifyPasswordModal: React.FC<ModifyPasswordModalProps> = ({
   return (
     <Modal
       title="修改账号密码"
-      open={visible}
+      open={open}
       onCancel={onCancel}
       footer={[
         <Button key="cancel" onClick={onCancel}>

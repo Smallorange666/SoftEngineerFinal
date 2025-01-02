@@ -5,7 +5,7 @@ import { UpdateVehicleModalProps } from "../types";
 
 const UpdateVehicleModal: React.FC<UpdateVehicleModalProps> = ({
   vehicle_id,
-  visible,
+  open,
   onCancel,
   onUpdateSuccess,
 }) => {
@@ -49,15 +49,15 @@ const UpdateVehicleModal: React.FC<UpdateVehicleModalProps> = ({
 
   // 当 modal 可见且 vehicle_id 变化时，填充表单
   useEffect(() => {
-    if (visible && vehicle_id !== null) {
+    if (open && vehicle_id !== null) {
       fillForm();
     }
-  }, [visible, vehicle_id]);
+  }, [open, vehicle_id]);
 
   return (
     <Modal
       title="更新车辆信息"
-      open={visible}
+      open={open}
       onCancel={onCancel}
       onOk={() => form.submit()}
       okText="提交"

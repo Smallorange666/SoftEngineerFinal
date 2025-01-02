@@ -315,7 +315,7 @@ const CustomerPage: React.FC<User> = ({ user }) => {
       />
 
       <AddCustomerModal
-        visible={isAddCustomerModalOpen}
+        open={isAddCustomerModalOpen}
         onCancel={cancelAddCustomerModal}
         onCreateSuccess={fetchData} // 创建成功后重新加载数据
       />
@@ -323,7 +323,7 @@ const CustomerPage: React.FC<User> = ({ user }) => {
       <UpdateProfileModal
         user={user}
         customer_id={selectedCustomerID as number}
-        visible={isUpdateProfileModalOpen}
+        open={isUpdateProfileModalOpen}
         onCancel={cancelUpdateProfileModal}
         onUpdateProfileSuccess={fetchData} // 更新成功后重新加载数据
       />

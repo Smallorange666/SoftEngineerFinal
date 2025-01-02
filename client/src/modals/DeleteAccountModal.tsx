@@ -6,7 +6,7 @@ import { deleteAccount } from "../services/userServices";
 
 const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
   user,
-  visible,
+  open,
   onCancel,
   onDeleteAccountSuccess,
 }) => {
@@ -48,7 +48,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
           {isConfirming ? "确认注销账号" : "注销账号"}
         </span>
       }
-      open={visible}
+      open={open}
       onCancel={() => {
         form.resetFields(); // 重置表单
         setIsConfirming(false); // 重置确认状态

@@ -12,10 +12,7 @@ import {
   fetchAllVehicles,
   deleteVehicle,
   createVehicle,
-  rentVehicle,
 } from "../services/vehicleServices.tsx"; // 导入服务函数
-
-import { fetchCustomerByID } from "../services/customerServices.tsx";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -266,8 +263,8 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
             <Button
               type="link"
               onClick={() => {
-                showUpdateVehicleModal();
                 setSelectedVehicleId(record.vehicle_id);
+                showUpdateVehicleModal();
               }}
             >
               修改信息
@@ -277,8 +274,8 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
             <Button
               type="link"
               onClick={() => {
-                showRentalModal();
                 setSelectedVehicleId(record.vehicle_id);
+                showRentalModal();
               }}
             >
               租赁
@@ -307,32 +304,6 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
       setIsAddVehicleModalOpen(false); // 关闭 Modal
     } catch (error) {
       console.error("Error creating vehicle:", error);
-    }
-  };
-
-  // 租赁车辆
-  const handleRent = async (values: {
-    start_time: string;
-    duration_days: number;
-  }) => {
-    if (!selectedVehicleId || !user) {
-      message.error("未选择车辆或用户未登录，无法租赁");
-      return;
-    }
-
-    try {
-      const customerInfo = await fetchCustomerByID(user.user_id); // 获取客户信息
-      const customerId = customerInfo.customer_id;
-
-      if (!customerId) {
-        throw new Error("未找到对应的客户信息");
-      }
-
-      await rentVehicle(selectedVehicleId, customerId, values); // 调用服务函数
-      fetchData(); // 重新加载数据
-      setIsRentModalOpen(false); // 关闭 Modal
-    } catch (error) {
-      console.error("Error renting vehicle:", error);
     }
   };
 
@@ -391,22 +362,24 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
       />
 
       <AddVehicleModal
-        visible={isAddVehicleModalOpen}
+        open={isAddVehicleModalOpen}
         onCancel={cancelAddVehicleModal}
         onCreate={handleCreate}
       />
 
       <UpdateVehicleModal
         vehicle_id={selectedVehicleId}
-        visible={isUpdateVehicleModalOpen}
+        open={isUpdateVehicleModalOpen}
         onCancel={cancelUpdateVehicleModal}
         onUpdateSuccess={fetchData}
       />
 
       <RentalModal
+        vehicle_id={selectedVehicleId as number}
+        customer_id={user.customer_id}
         open={isRentModalOpen}
         onCancel={cancelRentalModal}
-        onRent={handleRent}
+        onRentSuccess={fetchData}
       />
     </div>
   );

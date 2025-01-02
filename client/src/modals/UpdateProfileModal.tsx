@@ -9,7 +9,7 @@ import {
 const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
   user,
   customer_id,
-  visible,
+  open,
   onCancel,
   onUpdateProfileSuccess,
 }) => {
@@ -50,15 +50,15 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
   };
 
   useEffect(() => {
-    if (visible && customer_id) {
+    if (open && customer_id) {
       fillForm();
     }
-  }, [visible, customer_id]);
+  }, [open, customer_id]);
 
   return (
     <Modal
       title="更改信息"
-      open={visible}
+      open={open}
       onCancel={onCancel}
       onOk={() => form.submit()}
       okText="提交"

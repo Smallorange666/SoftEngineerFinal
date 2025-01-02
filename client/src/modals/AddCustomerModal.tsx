@@ -4,7 +4,7 @@ import type { AddCustomerModalProps } from "../types";
 import { createCustomer } from "../services/customerServices"; // 导入服务函数
 
 const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
-  visible,
+  open,
   onCancel,
   onCreateSuccess,
 }) => {
@@ -54,7 +54,7 @@ const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
   return (
     <Modal
       title="新增用户"
-      open={visible}
+      open={open}
       onOk={handleOk}
       onCancel={onCancel}
       okText="创建"

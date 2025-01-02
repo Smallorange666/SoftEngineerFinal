@@ -224,7 +224,7 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
       <UpdateProfileModal
         user={user}
         customer_id={user.customer_id}
-        visible={isProfileModalVisible}
+        open={isProfileModalVisible}
         onCancel={() => setIsProfileModalVisible(false)}
         onUpdateProfileSuccess={() => {
           onLogout();
@@ -236,7 +236,7 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
       {/* ModifyPasswordModal */}
       <ModifyPasswordModal
         user={user}
-        visible={isModifyPasswordModalVisible}
+        open={isModifyPasswordModalVisible}
         onCancel={() => setIsModifyPasswordModalVisible(false)}
         onModifySuccess={() => {
           onLogout();
@@ -248,7 +248,7 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
       {/* DeleteAccountModal */}
       <DeleteAccountModal
         user={user}
-        visible={isDeleteAccountModalVisible}
+        open={isDeleteAccountModalVisible}
         onCancel={() => setIsDeleteAccountModalVisible(false)}
         onDeleteAccountSuccess={() => {
           setIsDeleteAccountModalVisible(false);

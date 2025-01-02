@@ -3,7 +3,7 @@ import { Modal, Form, Input, InputNumber, message } from "antd";
 import type { AddVehicleModalProps } from "../types.ts";
 
 const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
-  visible,
+  open,
   onCancel,
   onCreate,
 }) => {
@@ -23,7 +23,7 @@ const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
   return (
     <Modal
       title="新增车辆"
-      open={visible}
+      open={open}
       onOk={handleOk}
       onCancel={onCancel}
       okText="创建"

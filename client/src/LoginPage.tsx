@@ -101,7 +101,7 @@ const LoginPage: React.FC<{
 
       {/* 注册 Modal */}
       <RegisterModal
-        visible={isRegisterModalVisible}
+        open={isRegisterModalVisible}
         onCancel={() => setIsRegisterModalVisible(false)}
         onRegisterSuccess={() => {
           message.success("注册成功，请登录");
