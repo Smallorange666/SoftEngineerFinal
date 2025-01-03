@@ -4,11 +4,11 @@ import { Table, Input, Button, Space } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import AddVehicleModal from "../modals/AddVehiclesModal";
 import { VehicleInfo, User } from "../types";
+import { fetchAllVehicles, deleteVehicle } from "../services/vehicleServices";
+import AddVehicleModal from "../modals/AddVehiclesModal";
 import UpdateVehicleModal from "../modals/UpdateVehicleModal";
 import CustomerRentalModal from "../modals/CustomerRentalModal";
-import { fetchAllVehicles, deleteVehicle } from "../services/vehicleServices"; // 导入服务函数
 import AdminRentalModal from "../modals/AdminRentalModal";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
@@ -45,12 +45,10 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
     null
   );
 
-  // 打开新增车辆浮层
   const showAddVehicleModal = () => {
     setIsAddVehicleModalOpen(true);
   };
 
-  // 关闭新增车辆浮层
   const cancelAddVehicleModal = () => {
     setIsAddVehicleModalOpen(false);
   };

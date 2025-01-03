@@ -2,7 +2,6 @@ import { message } from "antd";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
-// 获取客户列表
 export const fetchAllCustomers = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/customers/all`);
@@ -18,7 +17,6 @@ export const fetchAllCustomers = async () => {
   }
 };
 
-// 根据 ID 获取客户信息
 export const fetchCustomerByID = async (customer_id: number) => {
   try {
     const response = await fetch(`${API_BASE_URL}/customers/${customer_id}`);
@@ -50,7 +48,6 @@ export const searchCustomers = async (searchText: string) => {
   }
 };
 
-// 删除客户
 export const deleteCustomer = async (customer_id: number) => {
   try {
     const response = await fetch(`${API_BASE_URL}/customers/${customer_id}`, {
@@ -67,7 +64,6 @@ export const deleteCustomer = async (customer_id: number) => {
   }
 };
 
-// 创建客户
 export const createCustomer = async (values: any) => {
   try {
     const response = await fetch(`${API_BASE_URL}/register`, {
@@ -88,7 +84,6 @@ export const createCustomer = async (values: any) => {
   }
 };
 
-// 更新客户信息
 export const updateCustomer = async (customer_id: number, values: any) => {
   try {
     const response = await fetch(`${API_BASE_URL}/customers/${customer_id}`, {

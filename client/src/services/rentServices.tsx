@@ -2,6 +2,23 @@ import { message } from "antd";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
+export const fetchPersonalRentals = async (customer_id: number) => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/rentals/customer/${customer_id}`
+    );
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error);
+    }
+    const data = await response.json();
+    return data.data;
+  } catch (error: any) {
+    message.error("获取个人租赁信息失败：" + error.message);
+    throw error;
+  }
+};
+
 export const fetchOngoingRental = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/rentals/ongoing`);

@@ -1,30 +1,21 @@
 import React, { useEffect, useState } from "react";
 import type { TableProps } from "antd";
 import { Table, Tag, message } from "antd";
-import { RentalInfo } from "../types";
-import { User } from "../types";
+import { User, PersonalRentalInfo } from "../types";
+import { fetchPersonalRentals } from "../services/rentServices";
 
 const MyRentalsPage: React.FC<User> = ({ user }) => {
-  const [data, setData] = useState<RentalInfo[]>([]);
+  const [data, setData] = useState<PersonalRentalInfo[]>([]);
   const [loading, setLoading] = useState(false);
 
   // 获取租赁历史数据
   const fetchData = async () => {
     setLoading(true);
     try {
-      const rentalsResponse = await fetch(
-        `http://localhost:5000/api/rentals/customer/${user.customer_id}`
-      );
-      if (!rentalsResponse.ok) {
-        const errorData = await rentalsResponse.json();
-        throw new Error(errorData.error);
-      }
-
-      const rentalsData = await rentalsResponse.json();
+      const rentalsData = await fetchPersonalRentals(user.user_id);
       setData(rentalsData);
     } catch (error: any) {
       message.error("获取租赁历史失败：" + error.message);
-      console.error("Error fetching rentals:", error);
     } finally {
       setLoading(false);
     }
@@ -37,7 +28,7 @@ const MyRentalsPage: React.FC<User> = ({ user }) => {
   }, [user?.user_id]);
 
   // 列定义
-  const columns: TableProps<RentalInfo>["columns"] = [
+  const columns: TableProps<PersonalRentalInfo>["columns"] = [
     {
       title: "车牌号",
       dataIndex: "plate_number",
@@ -106,7 +97,7 @@ const MyRentalsPage: React.FC<User> = ({ user }) => {
 
   return (
     <div>
-      <Table<RentalInfo>
+      <Table<PersonalRentalInfo>
         columns={columns}
         rowKey={(record) => record.rental_id.toString()}
         dataSource={data}

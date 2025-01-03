@@ -2,7 +2,6 @@ import { message } from "antd";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
-// 获取车辆列表
 export const fetchAllVehicles = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/vehicles`);
@@ -54,7 +53,6 @@ export const updateVehicle = async (vehicle_id: number, values: any) => {
   }
 };
 
-// 删除车辆
 export const deleteVehicle = async (vehicle_id: number) => {
   try {
     const response = await fetch(`${API_BASE_URL}/vehicles/${vehicle_id}`, {
@@ -71,7 +69,6 @@ export const deleteVehicle = async (vehicle_id: number) => {
   }
 };
 
-// 创建车辆
 export const createVehicle = async (values: any) => {
   try {
     const response = await fetch(`${API_BASE_URL}/vehicles`, {
@@ -92,7 +89,6 @@ export const createVehicle = async (values: any) => {
   }
 };
 
-// 租赁车辆
 export const rentVehicle = async (
   vehicleId: number,
   customerId: number,

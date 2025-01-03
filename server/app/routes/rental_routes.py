@@ -169,13 +169,13 @@ def get_canceled_rentals():
         return jsonify({'error': str(e)}), 500
 
 
-@bp.route('/api/rentals/<int:id>', methods=['GET'])
-def get_rental(id):
+@bp.route('/api/rentals/<int:rental_id>', methods=['GET'])
+def get_rental(rental_id):
     try:
         check_and_update_rental_status()
         # 获取指定租赁记录
         rental = Rental.query.filter_by(
-            rental_id=id).first()
+            rental_id=rental_id).first()
         if not rental:
             return jsonify({'error': 'Rental not found'}), 404
         return jsonify(rental.to_dict())
@@ -201,26 +201,29 @@ def get_customer_rentals(customer_id):
             .all()
         )
 
-        result = []
-        for rental in rentals:
-            rental_dict = {
-                'rental_id': rental.rental_id,
-                'vehicle_id': rental.vehicle_id,
-                'customer_id': rental.customer_id,
-                'start_time': rental.start_time.strftime('%Y-%m-%d %H:%M'),
-                'duration_days': rental.duration_days,
-                'expected_return_time': rental.expected_return_time.strftime('%Y-%m-%d %H:%M'),
-                'actual_return_time': rental.actual_return_time.strftime('%Y-%m-%d %H:%M') if rental.actual_return_time else None,
-                'total_fee': float(rental.total_fee),
-                'status': rental.status,
-                'plate_number': rental.vehicle.plate_number,
-                'type': rental.vehicle.type,
-                'brand': rental.vehicle.brand,
-                'model': rental.vehicle.model,
-                'color': rental.vehicle.color,
-                'price_per_day': float(rental.vehicle.price_per_day)
-            }
-            result.append(rental_dict)
+        result = {
+            'data': [
+                {
+                    'rental_id': rental.rental_id,
+                    'vehicle_id': rental.vehicle_id,
+                    'customer_id': rental.customer_id,
+                    'start_time': rental.start_time.strftime('%Y-%m-%d %H:%M'),
+                    'duration_days': rental.duration_days,
+                    'expected_return_time': rental.expected_return_time.strftime('%Y-%m-%d %H:%M'),
+                    'actual_return_time': rental.actual_return_time.strftime('%Y-%m-%d %H:%M') if rental.actual_return_time else None,
+                    'total_fee': float(rental.total_fee),
+                    'status': rental.status,
+                    'plate_number': rental.vehicle.plate_number,
+                    'type': rental.vehicle.type,
+                    'brand': rental.vehicle.brand,
+                    'model': rental.vehicle.model,
+                    'color': rental.vehicle.color,
+                    'price_per_day': float(rental.vehicle.price_per_day)
+                }
+                for rental in rentals
+            ],
+            'total': len(rentals)
+        }
 
         return jsonify(result)
     except Exception as e:

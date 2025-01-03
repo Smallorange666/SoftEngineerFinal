@@ -5,12 +5,12 @@ import type { FilterDropdownProps } from "antd/es/table/interface";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { User, CustomerInfo } from "../types";
-import AddCustomerModal from "../modals/AddCustomerModal";
-import UpdateProfileModal from "../modals/UpdateProfileModal";
 import {
   fetchAllCustomers,
   deleteCustomer,
-} from "../services/customerServices"; // 导入服务函数
+} from "../services/customerServices";
+import AddCustomerModal from "../modals/AddCustomerModal";
+import UpdateProfileModal from "../modals/UpdateProfileModal";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -43,22 +43,18 @@ const CustomerPage: React.FC<User> = ({ user }) => {
   const [isUpdateProfileModalOpen, setIsUpdateProfileModalOpen] =
     useState(false);
 
-  // 打开新增用户浮层
   const showAddCustomerModal = () => {
     setIsAddCustomerModalOpen(true);
   };
 
-  // 关闭新增用户浮层
   const cancelAddCustomerModal = () => {
     setIsAddCustomerModalOpen(false);
   };
 
-  // 打开更新用户信息浮层
   const showUpdateProfileModal = () => {
     setIsUpdateProfileModalOpen(true);
   };
 
-  // 关闭更新用户信息浮层
   const cancelUpdateProfileModal = () => {
     setIsUpdateProfileModalOpen(false);
   };
@@ -313,7 +309,7 @@ const CustomerPage: React.FC<User> = ({ user }) => {
       <AddCustomerModal
         open={isAddCustomerModalOpen}
         onCancel={cancelAddCustomerModal}
-        onCreateSuccess={fetchData} // 创建成功后重新加载数据
+        onCreateSuccess={fetchData}
       />
 
       <UpdateProfileModal
@@ -321,7 +317,7 @@ const CustomerPage: React.FC<User> = ({ user }) => {
         customer_id={selectedCustomerID as number}
         open={isUpdateProfileModalOpen}
         onCancel={cancelUpdateProfileModal}
-        onUpdateProfileSuccess={fetchData} // 更新成功后重新加载数据
+        onUpdateProfileSuccess={fetchData}
       />
     </div>
   );

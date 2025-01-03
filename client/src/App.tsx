@@ -12,17 +12,17 @@ import {
 import type { MenuProps } from "antd";
 import { Layout, Menu, theme, Button, Dropdown, message } from "antd";
 import { useNavigate } from "react-router-dom";
-import VehiclePage from "./subpages/VehiclesPage";
-import MyRentalPage from "./subpages/MyRentalPage";
-import UpdateProfileModal from "./modals/UpdateProfileModal"; // 引入 UpdateProfileModal
 import { AppProps } from "./types.ts";
 import CustomerPage from "./subpages/CustomerPage";
-import ModifyPasswordModal from "./modals/ModifyPasswordModal";
-import DeleteAccountModal from "./modals/DeleteAccountModal";
+import VehiclePage from "./subpages/VehiclesPage";
+import MyRentalPage from "./subpages/MyRentalPage";
 import OngoingRentalPage from "./subpages/OngoingRentalPage";
 import FinishedRentalPage from "./subpages/FinishedRentalPage";
 import OverdueRentalPage from "./subpages/OverdueRentalPage";
 import CancelledRentalPage from "./subpages/CancelledRentalPage";
+import UpdateProfileModal from "./modals/UpdateProfileModal";
+import ModifyPasswordModal from "./modals/ModifyPasswordModal";
+import DeleteAccountModal from "./modals/DeleteAccountModal";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -42,12 +42,13 @@ function getItem(
   } as MenuItem;
 }
 
+// 普通用户侧边栏项
 const customerSidebarItems: MenuItem[] = [
   getItem("车辆清单", "1", <CarOutlined />),
   getItem("我的租赁", "2", <AuditOutlined />),
 ];
 
-// 管理员专属菜单项配置
+// 管理员侧边栏项
 const adminSidebarItems: MenuItem[] = [
   getItem("车辆管理", "1", <CarOutlined />),
   getItem("客户管理", "2", <UserOutlined />),
@@ -76,7 +77,7 @@ const headerStyle: React.CSSProperties = {
   color: "#fff",
   height: 80,
   lineHeight: "64px",
-  backgroundColor: "#0958d9", // 深蓝色
+  backgroundColor: "#0958d9",
   fontSize: 27,
   fontFamily: "sans-serif",
   fontWeight: 550,
@@ -88,11 +89,12 @@ const headerStyle: React.CSSProperties = {
 const App: React.FC<AppProps> = ({ user, onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("1"); // 默认选中车辆管理
-  const [isProfileModalVisible, setIsProfileModalVisible] = useState(false); // 控制 UpdateProfileModal 显示/隐藏
+  const [isProfileModalVisible, setIsProfileModalVisible] = useState(false);
   const [isModifyPasswordModalVisible, setIsModifyPasswordModalVisible] =
-    useState(false); // 控制 ModifyPasswordModal 显示/隐藏
+    useState(false);
   const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] =
-    useState(false); // 控制 DeleteAccountModal 显示/隐藏s
+    useState(false);
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -229,7 +231,6 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
         </Layout>
       </Layout>
 
-      {/* UpdateProfileModal */}
       <UpdateProfileModal
         user={user}
         customer_id={user.customer_id}
@@ -242,7 +243,6 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
         }}
       />
 
-      {/* ModifyPasswordModal */}
       <ModifyPasswordModal
         user={user}
         open={isModifyPasswordModalVisible}
@@ -254,7 +254,6 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
         }}
       />
 
-      {/* DeleteAccountModal */}
       <DeleteAccountModal
         user={user}
         open={isDeleteAccountModalVisible}

@@ -1,6 +1,35 @@
 import { message } from "antd";
+import { User } from "../types";
 
 const API_BASE_URL = "http://localhost:5000/api";
+
+export const login = async (
+  username: string,
+  password: string
+): Promise<User> => {
+  try {
+    const response = await fetch("http://localhost:5000/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error);
+    }
+
+    const userData: User = await response.json();
+    return userData;
+  } catch (error: any) {
+    throw new Error("登录失败：" + error.message);
+  }
+};
 
 export const modifyPassword = async (user_id: number, values: any) => {
   try {
