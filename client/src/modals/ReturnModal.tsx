@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, Button } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
-import { ReturnModalProps } from "../types";
+import { ReturnModalProps } from "../types/prop";
 import { returnRental } from "../services/rentServices";
 
 const ReturnRentalModal: React.FC<ReturnModalProps> = ({
@@ -12,7 +12,6 @@ const ReturnRentalModal: React.FC<ReturnModalProps> = ({
 }) => {
   const handleSubmit = async () => {
     try {
-      // 执行归还操作
       await returnRental(rental_id); // 调用归还接口
       onReturnSuccess(); // 触发归还成功回调
       onCancel(); // 关闭模态框

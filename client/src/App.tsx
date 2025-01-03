@@ -12,7 +12,7 @@ import {
 import type { MenuProps } from "antd";
 import { Layout, Menu, theme, Button, Dropdown, message } from "antd";
 import { useNavigate } from "react-router-dom";
-import { AppProps } from "./types.ts";
+import { AppProps } from "./types/prop";
 import CustomerPage from "./subpages/CustomerPage";
 import VehiclePage from "./subpages/VehiclesPage";
 import MyRentalPage from "./subpages/MyRentalPage";

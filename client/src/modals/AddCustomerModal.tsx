@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Form, Input, message } from "antd";
-import type { AddCustomerModalProps } from "../types";
-import { createCustomer } from "../services/customerServices"; // 导入服务函数
+import type { AddCustomerModalProps } from "../types/prop";
+import { createCustomer } from "../services/customerServices";
 
 const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
   open,
@@ -26,7 +26,7 @@ const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      const username = generateRandomString(); // 生成用户名
+      const username = generateRandomString(); // 生成随机用户名
       const password = username; // 密码与用户名相同
       const role = "customer"; // 角色固定为 customer
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, Form, DatePicker, message } from "antd";
-import type { CustomerRentalModalProps } from "../types";
 import dayjs from "dayjs";
+import type { CustomerRentalModalProps } from "../types/prop";
 import { createRental } from "../services/rentServices";
 
 const CustomerRentalModal: React.FC<CustomerRentalModalProps> = ({

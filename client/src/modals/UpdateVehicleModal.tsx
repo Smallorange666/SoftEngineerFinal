@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, InputNumber, message } from "antd";
-import { fetchVehicleByID, updateVehicle } from "../services/vehicleServices"; // 导入服务函数
-import { UpdateVehicleModalProps } from "../types";
+import { fetchVehicleByID, updateVehicle } from "../services/vehicleServices";
+import { UpdateVehicleModalProps } from "../types/prop";
 
 const UpdateVehicleModal: React.FC<UpdateVehicleModalProps> = ({
   vehicle_id,

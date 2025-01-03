@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { Modal, Form, Input, message } from "antd";
 
 interface RegisterModalProps {
-  open: boolean; // 控制 Modal 显示/隐藏
-  onCancel: () => void; // 关闭 Modal 的回调
-  onRegisterSuccess: () => void; // 注册成功后的回调
+  open: boolean;
+  onCancel: () => void;
+  onRegisterSuccess: () => void;
 }
 
 const RegisterModal: React.FC<RegisterModalProps> = ({

@@ -4,7 +4,7 @@ import { Table, Input, Button, Space } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import { VehicleInfo, User } from "../types";
+import { VehicleInfo, User } from "../types/common";
 import { fetchAllVehicles, deleteVehicle } from "../services/vehicleServices";
 import AddVehicleModal from "../modals/AddVehiclesModal";
 import UpdateVehicleModal from "../modals/UpdateVehicleModal";

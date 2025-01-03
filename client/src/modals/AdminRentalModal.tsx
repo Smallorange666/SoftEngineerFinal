@@ -9,8 +9,9 @@ import {
   Space,
   Button,
 } from "antd";
-import type { AdminRentalModalProps, CustomerInfo } from "../types";
 import dayjs from "dayjs";
+import type { AdminRentalModalProps } from "../types/prop";
+import type { CustomerInfo } from "../types/common";
 import { createRental } from "../services/rentServices";
 import { searchCustomers } from "../services/customerServices";
 
