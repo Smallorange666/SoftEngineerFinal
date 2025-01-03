@@ -22,7 +22,7 @@ import DeleteAccountModal from "./modals/DeleteAccountModal";
 import OngoingRentalPage from "./subpages/OngoingRentalPage";
 import FinishedRentalPage from "./subpages/FinishedRentalPage";
 import OverdueRentalPage from "./subpages/OverdueRentalPage";
-import CanceledRentalPage from "./subpages/CanceledRentalPage";
+import CancelledRentalPage from "./subpages/CancelledRentalPage";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -164,7 +164,7 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
       case "5":
         return <FinishedRentalPage />;
       case "6":
-        return <CanceledRentalPage />;
+        return <CancelledRentalPage />;
       default:
         return <div>请选择一个菜单项</div>;
     }

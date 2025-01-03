@@ -4,8 +4,8 @@ import { Table, Input, Button, Space } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import { CanceledRentalInfo } from "../types";
-import { fetchCanceledRental } from "../services/rentServices";
+import { CancelledRentalInfo } from "../types";
+import { fetchCancelledRental } from "../services/rentServices";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
@@ -17,9 +17,9 @@ interface TableParams {
   pagination?: TablePaginationConfig;
 }
 
-const CanceledRentalPage: React.FC = () => {
-  const [data, setData] = useState<CanceledRentalInfo[]>([]);
-  const [filteredData, setFilteredData] = useState<CanceledRentalInfo[]>([]);
+const CancelledRentalPage: React.FC = () => {
+  const [data, setData] = useState<CancelledRentalInfo[]>([]);
+  const [filteredData, setFilteredData] = useState<CancelledRentalInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
@@ -35,7 +35,7 @@ const CanceledRentalPage: React.FC = () => {
   const handleSearch = (
     selectedKeys: string[],
     confirm: FilterDropdownProps["confirm"],
-    dataIndex: keyof CanceledRentalInfo
+    dataIndex: keyof CancelledRentalInfo
   ) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -73,8 +73,11 @@ const CanceledRentalPage: React.FC = () => {
   };
 
   const getColumnSearchProps = (
-    dataIndex: keyof CanceledRentalInfo
-  ): Exclude<TableProps<CanceledRentalInfo>["columns"], undefined>[number] => ({
+    dataIndex: keyof CancelledRentalInfo
+  ): Exclude<
+    TableProps<CancelledRentalInfo>["columns"],
+    undefined
+  >[number] => ({
     filterDropdown: ({
       setSelectedKeys,
       selectedKeys,
@@ -159,7 +162,7 @@ const CanceledRentalPage: React.FC = () => {
   });
 
   // 列定义
-  const columns: ColumnsType<CanceledRentalInfo> = [
+  const columns: ColumnsType<CancelledRentalInfo> = [
     {
       title: "ID",
       dataIndex: "rental_id",
@@ -194,7 +197,7 @@ const CanceledRentalPage: React.FC = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const rentals = await fetchCanceledRental(); // 调用服务函数
+      const rentals = await fetchCancelledRental(); // 调用服务函数
       setData(rentals);
       setFilteredData(rentals); // 初始化筛选数据
       setLoading(false);
@@ -214,7 +217,7 @@ const CanceledRentalPage: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleTableChange: TableProps<CanceledRentalInfo>["onChange"] = (
+  const handleTableChange: TableProps<CancelledRentalInfo>["onChange"] = (
     pagination
   ) => {
     setTableParams({
@@ -224,7 +227,7 @@ const CanceledRentalPage: React.FC = () => {
 
   return (
     <div>
-      <Table<CanceledRentalInfo>
+      <Table<CancelledRentalInfo>
         columns={columns}
         rowKey={(record) => record.rental_id.toString()}
         dataSource={filteredData} // 使用筛选后的数据
@@ -236,4 +239,4 @@ const CanceledRentalPage: React.FC = () => {
   );
 };
 
-export default CanceledRentalPage;
+export default CancelledRentalPage;

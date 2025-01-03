@@ -84,7 +84,7 @@ export interface FinishedRentalInfo extends BaseRentalInfo {
   actual_return_time: string;
 }
 
-export interface CanceledRentalInfo extends BaseRentalInfo {}
+export interface CancelledRentalInfo extends BaseRentalInfo {}
 
 export interface ReturnModalProps {
   rental_id: number;
