@@ -7,7 +7,7 @@ import Highlighter from "react-highlight-words";
 import { OngoningRentalInfo } from "../types";
 import { fetchOngoingRental } from "../services/rentServices";
 import CancelRentalModal from "../modals/CancelRentalModal";
-import ReturnRentalModal from "../modals/RenturnModal";
+import ReturnRentalModal from "../modals/ReturnModal";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<

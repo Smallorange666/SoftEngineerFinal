@@ -6,7 +6,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import { OverdueRentalInfo } from "../types";
 import { fetchOverdueRental } from "../services/rentServices";
-import ReturnRentalModal from "../modals/RenturnModal";
+import ReturnRentalModal from "../modals/ReturnModal";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];
 type TablePaginationConfig = Exclude<
