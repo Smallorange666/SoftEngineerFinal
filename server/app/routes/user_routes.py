@@ -1,4 +1,3 @@
-from werkzeug.security import check_password_hash
 from flask import request, jsonify
 from flask import jsonify, request
 from app.routes import bp

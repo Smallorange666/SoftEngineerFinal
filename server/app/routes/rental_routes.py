@@ -26,17 +26,6 @@ def check_and_update_rental_status():
         print(f"Error updating rental status: {e}")
 
 
-@bp.route('/api/rentals', methods=['GET'])
-def get_all_rentals():
-    try:
-        check_and_update_rental_status()
-        # 获取所有租赁记录
-        rentals = Rental.query.all()
-        return jsonify([rental.to_dict() for rental in rentals])
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
 @bp.route('/api/rentals/ongoing', methods=['GET'])
 def get_ongoing_rentals():
     try:
@@ -301,12 +290,12 @@ def create_rental():
         return jsonify({'error': str(e)}), 500
 
 
-@bp.route('/api/rentals/<int:id>', methods=['PUT'])
-def update_rental(id):
+@bp.route('/api/rentals/<int:reantal_id>', methods=['PUT'])
+def update_rental(reantal_id):
     try:
         # 获取租赁记录
         rental = Rental.query.filter_by(
-            rental_id=id).first()
+            rental_id=reantal_id).first()
         if not rental:
             return jsonify({'error': 'Rental not found'}), 404
 
@@ -353,12 +342,12 @@ def update_rental(id):
         return jsonify({'error': str(e)}), 500
 
 
-@bp.route('/api/rentals/<int:id>', methods=['DELETE'])
-def cancel_rental(id):
+@bp.route('/api/rentals/<int:reantal_id>', methods=['DELETE'])
+def cancel_rental(reantal_id):
     try:
         # 获取租赁记录，排除已删除的记录
         rental = Rental.query.filter_by(
-            rental_id=id).first()
+            rental_id=reantal_id).first()
         if not rental:
             return jsonify({'error': 'Rental not found'}), 404
 
