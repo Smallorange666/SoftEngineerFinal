@@ -253,6 +253,9 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
       title: "状态",
       dataIndex: "status",
       width: "10%",
+      render: (_, record) => (
+        <span>{record.status === "available" ? "可租用" : "忙碌中"}</span>
+      ),
       ...getColumnSearchProps("status"),
     },
     {

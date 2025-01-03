@@ -1,4 +1,3 @@
-
 from flask import jsonify, request
 from sqlalchemy import or_
 from app.routes import bp
@@ -6,24 +5,18 @@ from app.models import Rental, Vehicle, Customer
 from app import db
 from datetime import datetime, timedelta
 
-# 定义有效的租赁状态
-VALID_RENTAL_STATUS = ['进行中', '已完成', '已逾期', '已取消']
+VALID_RENTAL_STATUS = ['ongoing', 'completed', 'overdue', 'cancelled']
 
 
 def check_and_update_rental_status():
-    """
-    检查所有租赁记录，如果有到时间未归还的，更新状态为 '已逾期'
-    """
     try:
-        # 获取所有状态为 '进行中' 且预期归还时间已过的租赁记录
         overdue_rentals = Rental.query.filter(
-            Rental.status == '进行中',
+            Rental.status == 'ongoing',
             Rental.expected_return_time < datetime.now()
         ).all()
 
-        # 更新状态为 '已逾期'
         for rental in overdue_rentals:
-            rental.status = '已逾期'
+            rental.status = 'overdue'
             db.session.add(rental)
 
         db.session.commit()
@@ -34,238 +27,238 @@ def check_and_update_rental_status():
 
 @bp.route('/api/rentals', methods=['GET'])
 def get_all_rentals():
-    # 检查并更新租赁状态
-    check_and_update_rental_status()
-
-    # 获取所有租赁记录
-    rentals = Rental.query.all()
-    return jsonify([rental.to_dict() for rental in rentals])
+    try:
+        check_and_update_rental_status()
+        rentals = Rental.query.all()
+        return jsonify([rental.to_dict() for rental in rentals])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @bp.route('/api/rentals/ongoing', methods=['GET'])
 def get_ongoing_rentals():
-    # 联表查询 Rental、Customer 和 Vehicle
-    rentals = (
-        db.session.query(Rental, Customer.name,
-                         Customer.phone, Vehicle.plate_number)
-        .join(Customer, Rental.customer_id == Customer.customer_id, isouter=True)
-        .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id, isouter=True)
-        .filter(Rental.status == '进行中')
-        .all()
-    )
+    try:
+        rentals = (
+            db.session.query(Rental, Customer.name,
+                             Customer.phone, Vehicle.plate_number)
+            .join(Customer, Rental.customer_id == Customer.customer_id, isouter=True)
+            .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id, isouter=True)
+            .filter(Rental.status == 'ongoing')
+            .all()
+        )
 
-    # 构造返回数据
-    result = {
-        'data': [
-            {
-                'rental_id': rental.rental_id,
-                'plate_number': plate_number,
-                'name': name,
-                'phone': phone,
-                'total_fee': rental.total_fee,
-                'expected_return_time': rental.expected_return_time.strftime('%Y-%m-%d %H:%M:%S') if rental.expected_return_time else None,
-            }
-            for rental, name, phone, plate_number in rentals
-        ],
-        'total': len(rentals)
-    }
+        result = {
+            'data': [
+                {
+                    'rental_id': rental.rental_id,
+                    'plate_number': plate_number,
+                    'name': name,
+                    'phone': phone,
+                    'total_fee': rental.total_fee,
+                    'expected_return_time': rental.expected_return_time.strftime('%Y-%m-%d %H:%M:%S') if rental.expected_return_time else None,
+                }
+                for rental, name, phone, plate_number in rentals
+            ],
+            'total': len(rentals)
+        }
 
-    return jsonify(result)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @bp.route('/api/rentals/overdue', methods=['GET'])
 def get_overdue_rentals():
-    # 联表查询 Rental、Customer 和 Vehicle
-    rentals = (
-        db.session.query(Rental, Customer.name,
-                         Customer.phone, Vehicle.plate_number)
-        .join(Customer, Rental.customer_id == Customer.customer_id, isouter=True)
-        .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id, isouter=True)
-        .filter(Rental.status == '已逾期')
-        .all()
-    )
+    try:
+        rentals = (
+            db.session.query(Rental, Customer.name,
+                             Customer.phone, Vehicle.plate_number)
+            .join(Customer, Rental.customer_id == Customer.customer_id, isouter=True)
+            .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id, isouter=True)
+            .filter(Rental.status == 'overdue')
+            .all()
+        )
 
-    # 构造返回数据
-    result = {
-        'data': [
-            {
-                'rental_id': rental.rental_id,
-                'plate_number': plate_number,
-                'name': name,
-                'phone': phone,
-                'total_fee': rental.total_fee,
-                'expected_return_time': rental.expected_return_time.strftime('%Y-%m-%d %H:%M:%S') if rental.expected_return_time else None,
-            }
-            for rental, name, phone, plate_number in rentals
-        ],
-        'total': len(rentals)
-    }
+        result = {
+            'data': [
+                {
+                    'rental_id': rental.rental_id,
+                    'plate_number': plate_number,
+                    'name': name,
+                    'phone': phone,
+                    'total_fee': rental.total_fee,
+                    'expected_return_time': rental.expected_return_time.strftime('%Y-%m-%d %H:%M:%S') if rental.expected_return_time else None,
+                }
+                for rental, name, phone, plate_number in rentals
+            ],
+            'total': len(rentals)
+        }
 
-    return jsonify(result)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @bp.route('/api/rentals/finished', methods=['GET'])
 def get_finished_rentals():
-    # 联表查询 Rental、Customer 和 Vehicle
-    rentals = (
-        db.session.query(Rental, Customer.name,
-                         Customer.phone, Vehicle.plate_number)
-        .join(Customer, Rental.customer_id == Customer.customer_id, isouter=True)
-        .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id, isouter=True)
-        .filter(Rental.status == '已完成')
-        .all()
-    )
+    try:
+        rentals = (
+            db.session.query(Rental, Customer.name,
+                             Customer.phone, Vehicle.plate_number)
+            .join(Customer, Rental.customer_id == Customer.customer_id, isouter=True)
+            .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id, isouter=True)
+            .filter(Rental.status == 'completed')
+            .all()
+        )
 
-    # 构造返回数据
-    result = {
-        'data': [
-            {
-                'rental_id': rental.rental_id,
-                'plate_number': plate_number,
-                'name': name,
-                'phone': phone,
-                'total_fee': rental.total_fee,
-                'actual_return_time': rental.actual_return_time.strftime('%Y-%m-%d %H:%M:%S') if rental.actual_return_time else None,
-            }
-            for rental, name, phone, plate_number in rentals
-        ],
-        'total': len(rentals)
-    }
+        result = {
+            'data': [
+                {
+                    'rental_id': rental.rental_id,
+                    'plate_number': plate_number,
+                    'name': name,
+                    'phone': phone,
+                    'total_fee': rental.total_fee,
+                    'actual_return_time': rental.actual_return_time.strftime('%Y-%m-%d %H:%M:%S') if rental.actual_return_time else None,
+                }
+                for rental, name, phone, plate_number in rentals
+            ],
+            'total': len(rentals)
+        }
 
-    return jsonify(result)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @bp.route('/api/rentals/canceled', methods=['GET'])
 def get_canceled_rentals():
-    # 联表查询 Rental、Customer 和 Vehicle
-    rentals = (
-        db.session.query(Rental, Customer.name,
-                         Customer.phone, Vehicle.plate_number)
-        .join(Customer, Rental.customer_id == Customer.customer_id, isouter=True)
-        .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id, isouter=True)
-        .filter(Rental.status == '已取消')
-        .all()
-    )
+    try:
+        rentals = (
+            db.session.query(Rental, Customer.name,
+                             Customer.phone, Vehicle.plate_number)
+            .join(Customer, Rental.customer_id == Customer.customer_id, isouter=True)
+            .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id, isouter=True)
+            .filter(Rental.status == 'cancelled')
+            .all()
+        )
 
-    # 构造返回数据
-    result = {
-        'data': [
-            {
-                'rental_id': rental.rental_id,
-                'plate_number': plate_number,
-                'name': name,
-                'phone': phone,
-                'total_fee': rental.total_fee,
-                'actual_return_time': rental.actual_return_time.strftime('%Y-%m-%d %H:%M:%S') if rental.actual_return_time else None,
-            }
-            for rental, name, phone, plate_number in rentals
-        ],
-        'total': len(rentals)
-    }
+        result = {
+            'data': [
+                {
+                    'rental_id': rental.rental_id,
+                    'plate_number': plate_number,
+                    'name': name,
+                    'phone': phone,
+                    'total_fee': rental.total_fee,
+                    'actual_return_time': rental.actual_return_time.strftime('%Y-%m-%d %H:%M:%S') if rental.actual_return_time else None,
+                }
+                for rental, name, phone, plate_number in rentals
+            ],
+            'total': len(rentals)
+        }
 
-    return jsonify(result)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @bp.route('/api/rentals/<int:id>', methods=['GET'])
 def get_rental(id):
-    # 检查并更新租赁状态
-    check_and_update_rental_status()
-
-    # 获取指定租赁记录
-    rental = Rental.query.get_or_404(id)
-    return jsonify(rental.to_dict())
+    try:
+        check_and_update_rental_status()
+        rental = Rental.query.get(id)
+        if not rental:
+            return jsonify({'error': 'Rental not found'}), 404
+        return jsonify(rental.to_dict())
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @bp.route('/api/rentals/customer/<int:customer_id>', methods=['GET'])
 def get_customer_rentals(customer_id):
-    # 检查并更新租赁状态
-    check_and_update_rental_status()
+    try:
+        check_and_update_rental_status()
+        customer = Customer.query.get(customer_id)
+        if not customer:
+            return jsonify({'error': 'Customer not found'}), 404
 
-    # 验证客户是否存在
-    customer = Customer.query.get(customer_id)
-    if (customer is None):
-        return jsonify({'error': 'Customer not found'}), 404
+        rentals = (
+            Rental.query
+            .filter_by(customer_id=customer.customer_id)
+            .join(Vehicle)
+            .order_by(Rental.start_time.desc())
+            .all()
+        )
 
-    # 联表查询租赁历史和车辆信息
-    rentals = (
-        Rental.query
-        .filter_by(customer_id=customer.customer_id)
-        .join(Vehicle)  # 联表查询车辆信息
-        .order_by(Rental.start_time.desc())  # 按 start_time 降序排序
-        .all()
-    )
+        result = []
+        for rental in rentals:
+            rental_dict = {
+                'rental_id': rental.rental_id,
+                'vehicle_id': rental.vehicle_id,
+                'customer_id': rental.customer_id,
+                'start_time': rental.start_time.strftime('%Y-%m-%d %H:%M'),
+                'duration_days': rental.duration_days,
+                'expected_return_time': rental.expected_return_time.strftime('%Y-%m-%d %H:%M'),
+                'actual_return_time': rental.actual_return_time.strftime('%Y-%m-%d %H:%M') if rental.actual_return_time else None,
+                'total_fee': float(rental.total_fee),
+                'status': rental.status,
+                'plate_number': rental.vehicle.plate_number,
+                'type': rental.vehicle.type,
+                'brand': rental.vehicle.brand,
+                'model': rental.vehicle.model,
+                'color': rental.vehicle.color,
+                'price_per_day': float(rental.vehicle.price_per_day)
+            }
+            result.append(rental_dict)
 
-    # 构造返回数据，将车辆信息平铺到租赁信息中
-    result = []
-    for rental in rentals:
-        rental_dict = {
-            'rental_id': rental.rental_id,
-            'vehicle_id': rental.vehicle_id,
-            'customer_id': rental.customer_id,
-            'start_time': rental.start_time.strftime('%Y-%m-%d %H:%M'),
-            'duration_days': rental.duration_days,
-            'expected_return_time': rental.expected_return_time.strftime('%Y-%m-%d %H:%M'),
-            'actual_return_time': rental.actual_return_time.strftime('%Y-%m-%d %H:%M') if rental.actual_return_time else None,
-            'total_fee': float(rental.total_fee),
-            'status': rental.status,
-            'plate_number': rental.vehicle.plate_number,
-            'type': rental.vehicle.type,
-            'brand': rental.vehicle.brand,
-            'model': rental.vehicle.model,
-            'color': rental.vehicle.color,
-            'price_per_day': float(rental.vehicle.price_per_day)
-        }
-        result.append(rental_dict)
-
-    return jsonify(result)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @bp.route('/api/rentals', methods=['POST'])
 def create_rental():
-    check_and_update_rental_status()
-
-    data = request.get_json()
-
-    # 验证必需字段
-    required_fields = ['vehicle_id', 'customer_id', 'duration_days']
-    missing_fields = [field for field in required_fields if field not in data]
-    if missing_fields:
-        return jsonify({'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
-
-    vehicle_id = data['vehicle_id']
-    customer_id = data['customer_id']
-    duration_days = int(data['duration_days'])
-
-    # 检查用户本人是否存在逾期未还的租赁记录
-    overdue_rental = Rental.query.filter(
-        Rental.customer_id == customer_id,
-        Rental.status == '已逾期'
-    ).first()
-    if overdue_rental:
-        return jsonify({'error': 'Customer has overdue rental'}), 400
-
-    # 验证租赁天数
     try:
-        if duration_days <= 0:
-            return jsonify({'error': 'Duration days must be positive'}), 400
-    except ValueError:
-        return jsonify({'error': 'Invalid duration days format'}), 400
+        check_and_update_rental_status()
+        data = request.get_json()
 
-    # 检查车辆是否已被租赁
-    ongoing_rental = (
-        Rental.query
-        .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id)  # 联表查询
-        .filter(
-            Rental.vehicle_id == vehicle_id,
-            Vehicle.is_deleted == False
-        ).filter(
-            or_(Rental.status == '进行中', Rental.status == '已逾期')
+        required_fields = ['vehicle_id', 'customer_id', 'duration_days']
+        missing_fields = [
+            field for field in required_fields if field not in data]
+        if missing_fields:
+            return jsonify({'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+
+        vehicle_id = data['vehicle_id']
+        customer_id = data['customer_id']
+        duration_days = int(data['duration_days'])
+
+        overdue_rental = Rental.query.filter(
+            Rental.customer_id == customer_id,
+            Rental.status == 'overdue'
         ).first()
-    )
-    if ongoing_rental:
-        return jsonify({'error': 'Vehicle is currently rented out'}), 400
+        if overdue_rental:
+            return jsonify({'error': 'Customer has overdue rental'}), 400
 
-    try:
+        try:
+            if duration_days <= 0:
+                return jsonify({'error': 'Duration days must be positive'}), 400
+        except ValueError:
+            return jsonify({'error': 'Invalid duration days format'}), 400
+
+        ongoing_rental = (
+            Rental.query
+            .join(Vehicle, Rental.vehicle_id == Vehicle.vehicle_id)
+            .filter(
+                Rental.vehicle_id == vehicle_id,
+                Vehicle.is_deleted == False
+            ).filter(
+                or_(Rental.status == 'ongoing', Rental.status == 'overdue')
+            ).first()
+        )
+        if ongoing_rental:
+            return jsonify({'error': 'Vehicle is currently rented out'}), 400
+
         start_time = datetime.now()
         expected_return_time = start_time + timedelta(days=duration_days)
         vehicle = Vehicle.query.get(vehicle_id)
@@ -280,48 +273,44 @@ def create_rental():
             duration_days=duration_days,
             expected_return_time=expected_return_time,
             total_fee=total_fee,
-            status='进行中'
+            status='ongoing'
         )
         db.session.add(rental)
         db.session.commit()
         return jsonify(rental.to_dict()), 201
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 400
+        return jsonify({'error': str(e)}), 500
 
 
-@ bp.route('/api/rentals/<int:id>', methods=['PUT'])
+@bp.route('/api/rentals/<int:id>', methods=['PUT'])
 def update_rental(id):
-    rental = Rental.query.get_or_404(id)
-    data = request.get_json()
-
     try:
-        # 验证状态
+        rental = Rental.query.get(id)
+        if not rental:
+            return jsonify({'error': 'Rental not found'}), 404
+
+        data = request.get_json()
+
         if 'status' in data:
             if data['status'] not in VALID_RENTAL_STATUS:
                 return jsonify({'error': 'Invalid rental status'}), 400
 
-            # 不允许将已完成或已取消的租赁改回进行中
-            if rental.status in ['已完成', '已取消'] and data['status'] == '进行中':
-                return jsonify({'error': 'Cannot change completed or cancelled rental back to in progress'}), 400
+            if rental.status in ['completed', 'cancelled'] and data['status'] == 'ongoing':
+                return jsonify({'error': 'Cannot change completed or cancelled rental back to ongoing'}), 400
 
-            # 如果要完成租赁
-            if data['status'] == '已完成' and rental.status == '进行中':
+            if data['status'] == 'completed' and rental.status == 'ongoing':
                 rental.actual_return_time = datetime.now()
-                # 更新车辆状态为可租用
                 vehicle = Vehicle.query.get(rental.vehicle_id)
-                vehicle.status = '可租用'
+                vehicle.status = 'available'
 
-            # 如果要取消租赁
-            elif data['status'] == '已取消' and rental.status == '进行中':
-                # 更新车辆状态为可租用
+            elif data['status'] == 'cancelled' and rental.status == 'ongoing':
                 vehicle = Vehicle.query.get(rental.vehicle_id)
-                vehicle.status = '可租用'
+                vehicle.status = 'available'
 
             rental.status = data['status']
 
-        # 如果租赁正在进行中，允许更新预期归还时间和租赁天数
-        if rental.status == '进行中':
+        if rental.status == 'ongoing':
             if 'duration_days' in data:
                 try:
                     duration_days = int(data['duration_days'])
@@ -339,40 +328,38 @@ def update_rental(id):
         return jsonify(rental.to_dict())
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 400
+        return jsonify({'error': str(e)}), 500
 
 
-@ bp.route('/api/rentals/<int:id>', methods=['DELETE'])
+@bp.route('/api/rentals/<int:id>', methods=['DELETE'])
 def cancel_rental(id):
-    rental = Rental.query.get_or_404(id)
-
     try:
-        # 只有进行中的租赁才能取消
-        if rental.status != '进行中':
+        rental = Rental.query.get(id)
+        if not rental:
+            return jsonify({'error': 'Rental not found'}), 404
+
+        if rental.status != 'ongoing':
             return jsonify({'error': 'Only ongoing rental can be cancelled'}), 400
 
-        # 更新租赁状态为 '已取消'
-        rental.status = '已取消'
+        rental.status = 'cancelled'
         db.session.commit()
         return jsonify(rental.to_dict())
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 400
+        return jsonify({'error': str(e)}), 500
 
 
 @bp.route('/api/rentals/<int:rental_id>', methods=['PATCH'])
 def return_vehicle(rental_id):
-    rental = Rental.query.get(rental_id)
-    if not rental:
-        return jsonify({'error': 'Rental not found'}), 404
-
     try:
-        # 只有进行中的租赁才能还车
-        if rental.status not in ['进行中', '已逾期']:
+        rental = Rental.query.get(rental_id)
+        if not rental:
+            return jsonify({'error': 'Rental not found'}), 404
+
+        if rental.status not in ['ongoing', 'overdue']:
             return jsonify({'error': 'Only ongoing or overdue rentals can be returned'}), 400
 
-        # 更新租赁状态为 '已完成'
-        rental.status = '已完成'
+        rental.status = 'completed'
         rental.actual_return_time = datetime.now()
         db.session.commit()
         return '', 204
