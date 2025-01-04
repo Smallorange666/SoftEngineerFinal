@@ -75,7 +75,7 @@ const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
             { required: true, message: "请输入车牌号" },
             {
               pattern: PLATE_NUMBER_PATTERN,
-              message: "手机号格式不正确",
+              message: "车牌号格式不正确",
             },
           ]}
         >
