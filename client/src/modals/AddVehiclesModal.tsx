@@ -2,6 +2,7 @@ import React from "react";
 import { Modal, Form, Input, InputNumber, message } from "antd";
 import type { AddVehicleModalProps } from "../types/prop";
 import { createVehicle } from "../services/vehicleServices";
+import { PLATE_NUMBER_PATTERN } from "../types/common";
 
 const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
   open,
@@ -70,7 +71,13 @@ const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
         <Form.Item
           name="plate_number"
           label="车牌号"
-          rules={[{ required: true, message: "请输入车牌号" }]}
+          rules={[
+            { required: true, message: "请输入车牌号" },
+            {
+              pattern: PLATE_NUMBER_PATTERN,
+              message: "手机号格式不正确",
+            },
+          ]}
         >
           <Input />
         </Form.Item>

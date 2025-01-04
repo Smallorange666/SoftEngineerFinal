@@ -1,3 +1,7 @@
+export const PHONE_PATTERN = /^\d{11}$/;
+export const ID_CARD_PATTERN = /^\d{17}[\dXx]$/;
+export const PLATE_NUMBER_PATTERN = /^[\u4e00-\u9fa5]{1}[A-Z]{1}[A-Z_0-9]{5}$/;
+
 export interface User {
   user: {
     user_id: number;

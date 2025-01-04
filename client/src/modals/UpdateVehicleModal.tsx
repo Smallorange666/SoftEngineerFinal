@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, InputNumber, message } from "antd";
 import { fetchVehicleByID, updateVehicle } from "../services/vehicleServices";
 import { UpdateVehicleModalProps } from "../types/prop";
+import { PLATE_NUMBER_PATTERN } from "../types/common";
 
 const UpdateVehicleModal: React.FC<UpdateVehicleModalProps> = ({
   vehicle_id,
@@ -11,9 +12,6 @@ const UpdateVehicleModal: React.FC<UpdateVehicleModalProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-
-  // 车牌号正则验证
-  const plateNumberPattern = /^[\u4e00-\u9fa5][A-Z][A-Z0-9]{5}$/;
 
   // 获取车辆信息并填充表单
   const fillForm = async () => {
@@ -121,8 +119,8 @@ const UpdateVehicleModal: React.FC<UpdateVehicleModalProps> = ({
           rules={[
             { required: true, message: "请输入车牌号" },
             {
-              pattern: plateNumberPattern,
-              message: "车牌号格式不正确（例：粤A12345）",
+              pattern: PLATE_NUMBER_PATTERN,
+              message: "车牌号格式不正确",
             },
           ]}
         >

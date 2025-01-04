@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Modal, Form, Input, message } from "antd";
 import type { AddCustomerModalProps } from "../types/prop";
 import { createCustomer } from "../services/customerServices";
+import { ID_CARD_PATTERN, PHONE_PATTERN } from "../types/common";
 
 const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
   open,
@@ -78,7 +79,7 @@ const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
           label="手机号"
           rules={[
             { required: true, message: "请输入手机号" },
-            { pattern: /^\d{11}$/, message: "手机号格式不正确" },
+            { pattern: PHONE_PATTERN, message: "手机号格式不正确" },
           ]}
         >
           <Input placeholder="请输入手机号" />
@@ -98,7 +99,7 @@ const AddCustomerModal: React.FC<AddCustomerModalProps> = ({
           label="身份证号"
           rules={[
             { required: true, message: "请输入身份证号" },
-            { pattern: /^\d{17}[\dXx]$/, message: "身份证号格式不正确" },
+            { pattern: ID_CARD_PATTERN, message: "身份证号格式不正确" },
           ]}
         >
           <Input placeholder="请输入身份证号" />
