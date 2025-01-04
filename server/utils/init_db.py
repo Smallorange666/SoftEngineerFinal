@@ -4,7 +4,7 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.models import User
+from app.models import Users
 from app.models import Vehicle
 from app import create_app, db
 
@@ -44,8 +44,8 @@ def init_db():
             print("成功从初始化数据库！")
 
         # 添加一个管理员账号和一个普通用户账号
-        if User.query.count() == 0:
-            admin = User(
+        if Users.query.count() == 0:
+            admin = Users(
                 username='admin',
                 password_hash=generate_password_hash(
                     'admin'),  # 使用 bcrypt 哈希密码

@@ -122,7 +122,14 @@
 
    修改 config.py 中的数据库配置为自己的数据库配置，并创建数据库
 
-3. 运行项目
+3. 初始化数据库
+
+   ```bash
+   python gen_vehicle_data.py
+   python init_db.py
+   ```
+
+4. 运行项目
 
    ```bash
    python run.py
