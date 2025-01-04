@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, message } from "antd";
-import type { UpdateProfileModalProps } from "../types";
+import type { UpdateProfileModalProps } from "../types/prop";
 import {
   fetchCustomerByID,
   updateCustomer,

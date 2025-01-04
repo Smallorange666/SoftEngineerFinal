@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, Form, Input, Button } from "antd";
-import { ModifyPasswordModalProps } from "../types";
+import { ModifyPasswordModalProps } from "../types/prop";
 import { modifyPassword } from "../services/userServices";
 
 const ModifyPasswordModal: React.FC<ModifyPasswordModalProps> = ({

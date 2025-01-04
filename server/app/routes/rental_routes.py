@@ -290,58 +290,6 @@ def create_rental():
         return jsonify({'error': str(e)}), 500
 
 
-@bp.route('/api/rentals/<int:reantal_id>', methods=['PUT'])
-def update_rental(reantal_id):
-    try:
-        # 获取租赁记录
-        rental = Rental.query.filter_by(
-            rental_id=reantal_id).first()
-        if not rental:
-            return jsonify({'error': 'Rental not found'}), 404
-
-        data = request.get_json()
-
-        # 更新租赁状态
-        if 'status' in data:
-            if data['status'] not in VALID_RENTAL_STATUS:
-                return jsonify({'error': 'Invalid rental status'}), 400
-
-            if rental.status in ['completed', 'cancelled'] and data['status'] == 'ongoing':
-                return jsonify({'error': 'Cannot change completed or cancelled rental back to ongoing'}), 400
-
-            if data['status'] == 'completed' and rental.status == 'ongoing':
-                rental.actual_return_time = datetime.now()
-                vehicle = Vehicle.query.get(rental.vehicle_id)
-                vehicle.status = 'available'
-
-            elif data['status'] == 'cancelled' and rental.status == 'ongoing':
-                vehicle = Vehicle.query.get(rental.vehicle_id)
-                vehicle.status = 'available'
-
-            rental.status = data['status']
-
-        # 更新租赁天数
-        if rental.status == 'ongoing':
-            if 'duration_days' in data:
-                try:
-                    duration_days = int(data['duration_days'])
-                    if duration_days <= 0:
-                        return jsonify({'error': 'Duration days must be positive'}), 400
-                    rental.duration_days = duration_days
-                    rental.expected_return_time = rental.start_time + \
-                        timedelta(days=duration_days)
-                    rental.total_fee = float(
-                        rental.vehicle.price_per_day) * duration_days
-                except ValueError:
-                    return jsonify({'error': 'Invalid duration days format'}), 400
-
-        db.session.commit()
-        return jsonify(rental.to_dict())
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
-
-
 @bp.route('/api/rentals/<int:reantal_id>', methods=['DELETE'])
 def cancel_rental(reantal_id):
     try:

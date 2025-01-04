@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Form, Input, Button } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { DeleteAccountModalProps } from "../types";
+import { DeleteAccountModalProps } from "../types/prop";
 import { deleteAccount } from "../services/userServices";
 
 const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({

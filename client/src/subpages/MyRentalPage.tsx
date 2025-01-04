@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import type { TableProps } from "antd";
 import { Table, Tag, message } from "antd";
-import { User, PersonalRentalInfo } from "../types";
+import { User, PersonalRentalInfo } from "../types/common";
 import { fetchPersonalRentals } from "../services/rentServices";
 
 const MyRentalsPage: React.FC<User> = ({ user }) => {
@@ -83,14 +83,20 @@ const MyRentalsPage: React.FC<User> = ({ user }) => {
       title: "状态",
       dataIndex: "status",
       key: "status",
-      render: (status: string) => {
+      render: (status) => {
         let color = "default";
-        if (status === "进行中") {
+        if (
+          status === "cancelled" ||
+          status === "finished" ||
+          status === null
+        ) {
           color = "green";
-        } else if (status === "已逾期") {
+        } else {
           color = "red";
         }
-        return <Tag color={color}>{status}</Tag>;
+        return (
+          <span style={{ color }}>{color === "green" ? "可用" : "已租出"}</span>
+        );
       },
     },
   ];

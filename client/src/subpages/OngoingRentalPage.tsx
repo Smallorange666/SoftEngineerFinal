@@ -4,7 +4,7 @@ import { Table, Input, Button, Space } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import { OngoningRentalInfo } from "../types";
+import { OngoningRentalInfo } from "../types/common";
 import { fetchOngoingRental } from "../services/rentServices";
 import CancelRentalModal from "../modals/CancelRentalModal";
 import ReturnRentalModal from "../modals/ReturnModal";

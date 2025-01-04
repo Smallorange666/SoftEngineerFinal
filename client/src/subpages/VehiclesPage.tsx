@@ -251,10 +251,22 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
       title: "状态",
       dataIndex: "status",
       width: "10%",
-      render: (_, record) => (
-        <span>{record.status === "available" ? "可租用" : "忙碌中"}</span>
-      ),
       ...getColumnSearchProps("status"),
+      render: (status) => {
+        let color = "default";
+        if (
+          status === "cancelled" ||
+          status === "finished" ||
+          status === null
+        ) {
+          color = "green";
+        } else {
+          color = "red";
+        }
+        return (
+          <span style={{ color }}>{color === "green" ? "可用" : "已租出"}</span>
+        );
+      },
     },
     {
       title: "操作",
@@ -274,7 +286,9 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
             </Button>
           )}
 
-          {record.status === "可租用" &&
+          {(record.status === "cancelled" ||
+            record.status === "finished" ||
+            record.status === null) &&
             (user?.role === "admin" ? (
               <Button
                 type="link"
@@ -318,6 +332,7 @@ const VehiclesPage: React.FC<User> = ({ user }) => {
     setLoading(true);
     try {
       const vehicles = await fetchAllVehicles(); // 调用服务函数
+      console.log(vehicles);
       setData(vehicles);
       setFilteredData(vehicles); // 初始化筛选数据
       setLoading(false);

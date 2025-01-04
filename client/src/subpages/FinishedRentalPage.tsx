@@ -4,7 +4,7 @@ import { Table, Input, Button, Space } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import { FinishedRentalInfo } from "../types";
+import { FinishedRentalInfo } from "../types/common";
 import { fetchFinishedRental } from "../services/rentServices";
 
 type ColumnsType<T extends object = object> = TableProps<T>["columns"];

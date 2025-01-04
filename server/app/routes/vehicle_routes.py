@@ -34,7 +34,7 @@ def get_vehicles_and_rental_info():
             'data': [
                 {
                     **vehicle.to_dict(),
-                    'status': 'busy' if status in ['ongoing', 'overdue'] else 'available'
+                    'status': status,
                 }
                 for vehicle, status in vehicles
             ],

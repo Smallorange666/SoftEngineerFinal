@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Button } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { CancelRentalModalProps } from "../types";
+import { CancelRentalModalProps } from "../types/prop";
 import { cancelRental } from "../services/rentServices";
 
 const CancelRentalModal: React.FC<CancelRentalModalProps> = ({

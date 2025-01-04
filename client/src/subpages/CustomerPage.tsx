@@ -4,7 +4,7 @@ import { Table, Input, Button, Space } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
-import { User, CustomerInfo } from "../types";
+import { User, CustomerInfo } from "../types/common";
 import {
   fetchAllCustomers,
   deleteCustomer,
