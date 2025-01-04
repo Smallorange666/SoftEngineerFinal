@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type { TableProps } from "antd";
-import { Table, Tag, message } from "antd";
+import { Table, message } from "antd";
 import { User, PersonalRentalInfo } from "../types/common";
 import { fetchPersonalRentals } from "../services/rentServices";
 
@@ -85,18 +85,30 @@ const MyRentalsPage: React.FC<User> = ({ user }) => {
       key: "status",
       render: (status) => {
         let color = "default";
-        if (
-          status === "cancelled" ||
-          status === "finished" ||
-          status === null
-        ) {
-          color = "green";
-        } else {
+        if (status === "overdue" || status === "cancelled") {
           color = "red";
+        } else {
+          color = "green";
         }
-        return (
-          <span style={{ color }}>{color === "green" ? "可用" : "已租出"}</span>
-        );
+        let content = "";
+        switch (status) {
+          case "overdue":
+            content = "已逾期";
+            break;
+          case "cancelled":
+            content = "已取消";
+            break;
+          case "finished":
+            content = "已完成";
+            break;
+          case "ongoing":
+            content = "进行中";
+            break;
+          default:
+            content = "";
+        }
+
+        return <span style={{ color }}>{content}</span>;
       },
     },
   ];

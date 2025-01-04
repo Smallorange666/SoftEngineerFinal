@@ -2,11 +2,9 @@ import { message } from "antd";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
-export const fetchPersonalRentals = async (customer_id: number) => {
+export const fetchPersonalRentals = async (user_id: number) => {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/rentals/customer/${customer_id}`
-    );
+    const response = await fetch(`${API_BASE_URL}/rentals/customer/${user_id}`);
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error);

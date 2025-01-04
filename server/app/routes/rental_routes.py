@@ -177,8 +177,10 @@ def get_customer_rentals(customer_id):
     try:
         check_and_update_rental_status()
         # 获取客户的租赁记录
+        # !!! 这里从前端获取的实际是use_id
         customer = Customer.query.filter_by(
-            customer_id=customer_id).first()
+            user_id=customer_id
+        ).first()
         if not customer:
             return jsonify({'error': 'Customer not found'}), 404
 
