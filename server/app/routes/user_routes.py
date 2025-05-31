@@ -37,6 +37,7 @@ def register():
             role='customer'
         )
         db.session.add(user)
+        db.session.flush()
 
         customer = Customer(
             user_id=user.user_id,
