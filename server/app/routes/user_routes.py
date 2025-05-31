@@ -37,6 +37,7 @@ def register():
             role='customer'
         )
         db.session.add(user)
+        # flush the cache
         db.session.flush()
 
         customer = Customer(
