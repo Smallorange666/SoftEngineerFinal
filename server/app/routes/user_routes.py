@@ -4,7 +4,7 @@ from app.routes import bp
 from app.models import Users, Customer
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from sqlalchemy import and_
 
 @bp.route('/api/register', methods=['POST'])
 def register():
@@ -29,6 +29,18 @@ def register():
         if Users.query.filter_by(username=data['username']).filter_by(is_deleted=False).first():
             return jsonify({'error': 'Username already exists'}), 400
 
+        # 验证ID_CARD是否重复
+        check1 = Customer.query.filter(and_(Customer.id_card == data['id_card'],
+                                                       Customer.is_deleted == False)).first()
+        if check1:
+            return jsonify({'error': '该身份证号已被注册'}), 409
+
+        # 验证phonenumber是否重复
+        check2 = Customer.query.filter(and_(Customer.phone == data['phone'],
+                                                       Customer.is_deleted == False)).first()
+        if check2:
+            return jsonify({'error': '该手机号已被注册'}), 409
+
         # 创建用户和客户记录
         password_hash = generate_password_hash(data['password'])
         user = Users(
@@ -37,7 +49,6 @@ def register():
             role='customer'
         )
         db.session.add(user)
-        # flush the cache
         db.session.flush()
 
         customer = Customer(
