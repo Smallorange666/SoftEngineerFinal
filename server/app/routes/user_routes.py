@@ -56,7 +56,8 @@ def register():
             name=data['name'],
             phone=data['phone'],
             address=data['address'] if 'address' in data else None,
-            id_card=data['id_card']
+            id_card=data['id_card'],
+            money="0.00"
         )
         db.session.add(customer)
 
@@ -104,7 +105,6 @@ def login():
             if not customer:
                 return jsonify({'error': 'Associated customer not found'}), 404
             customer_id = customer.customer_id
-
         return jsonify({
             'user': {
                 'user_id': user.user_id,
