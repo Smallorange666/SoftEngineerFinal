@@ -18,6 +18,7 @@ export interface CustomerInfo {
   phone: string;
   address: string;
   id_card: string;
+  money: number;
 }
 
 export interface CreateCustomerInfo extends CustomerInfo {

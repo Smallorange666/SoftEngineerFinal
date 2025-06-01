@@ -224,6 +224,25 @@ const CustomerPage: React.FC<User> = ({ user }) => {
       ...getColumnSearchProps("id_card"),
     },
     {
+      title: "账户余额",
+      dataIndex: "money",
+      width: "10%",
+      ...getColumnSearchProps("money"),
+      render: (value: any) =>
+      searchedColumn === "money" ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={
+            value != null && !isNaN(Number(value))
+              ? `¥${Number(value).toFixed(2)}`
+              : "¥0.00"
+          }
+        />
+      ) : value != null && !isNaN(Number(value)) ? (`¥${Number(value).toFixed(2)}`) : ("¥0.00"),
+    },
+    {
       title: "操作",
       key: "action",
       width: "10%",
