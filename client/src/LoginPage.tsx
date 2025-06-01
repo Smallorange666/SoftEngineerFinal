@@ -9,7 +9,7 @@ const LoginPage: React.FC<{
     user_id: number;
     username: string;
     role: string;
-    customer_id: number | null;
+    customer_id: number;
   }) => void;
 }> = ({ onLoginSuccess }) => {
   const navigate = useNavigate();
@@ -22,6 +22,14 @@ const LoginPage: React.FC<{
     try {
       // 调用 userServices 中的登录逻辑
       const userData = await login(values.username, values.password);
+
+      // 将用户信息存储到localStorage
+      localStorage.setItem('user', JSON.stringify({
+        user_id: userData.user.user_id,
+        username: userData.user.username,
+        role: userData.user.role,
+        customer_id: userData.user.customer_id,
+      }));
 
       onLoginSuccess({
         user_id: userData.user.user_id,
