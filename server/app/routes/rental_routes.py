@@ -4,6 +4,7 @@ from app.routes import bp
 from app.models import Rental, Vehicle, Customer
 from app import db
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 VALID_RENTAL_STATUS = ['ongoing', 'completed', 'overdue', 'cancelled']
 
@@ -274,7 +275,17 @@ def create_rental():
         if not vehicle:
             return jsonify({'error': 'Vehicle not found'}), 404
 
-        total_fee = float(vehicle.price_per_day) * duration_days
+        total_fee = Decimal(vehicle.price_per_day) * Decimal(duration_days)
+
+        # 检查是否余额充足
+        customer = Customer.query.filter_by(customer_id=customer_id).first()
+        customer_money = Decimal(customer.money)
+        if customer_money < total_fee:
+            return jsonify({'error': '余额不足'}), 400
+
+        # 减去费用
+        customer.money = customer.money - total_fee
+
         rental = Rental(
             vehicle_id=vehicle_id,
             customer_id=customer_id,
