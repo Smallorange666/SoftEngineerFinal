@@ -12,6 +12,8 @@ def init_db():
 
     app = create_app()
     with app.app_context():
+        # 清除所有表
+        db.drop_all()
         # 创建所有表
         db.create_all()
 

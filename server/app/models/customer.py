@@ -16,7 +16,8 @@ class Customer(db.Model):
     updated_at = db.Column(
         db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     is_deleted = db.Column(db.Boolean, default=False, nullable=False)
-    
+    money = db.Column(db.Numeric(10, 2), nullable=True)
+
     rentals = db.relationship('Rental', backref='customer', lazy=True)
 
     def to_dict(self):
