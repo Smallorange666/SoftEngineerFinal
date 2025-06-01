@@ -26,5 +26,6 @@ class Customer(db.Model):
             'name': self.name,
             'phone': self.phone,
             'address': self.address,
-            'id_card': self.id_card
+            'id_card': self.id_card,
+            'money': float(self.money)
         }
