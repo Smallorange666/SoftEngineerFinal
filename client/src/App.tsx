@@ -87,6 +87,10 @@ const headerStyle: React.CSSProperties = {
 };
 
 const App: React.FC<AppProps> = ({ user, onLogout }) => {
+  const handleLogout = () => {
+    onLogout(); // 调用父组件传递的登出函数，它会清除localStorage
+  };
+
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState("1"); // 默认选中车辆管理
   const [isProfileModalVisible, setIsProfileModalVisible] = useState(false);

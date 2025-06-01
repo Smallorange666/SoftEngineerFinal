@@ -14,8 +14,17 @@ const Root: React.FC = () => {
     user_id: number;
     username: string;
     role: string;
-    customer_id: number;
-  } | null>(null); // 用户状态
+    customer_id: number | null;
+  } | null>(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  }); // 用户状态
+
+  // 登出处理函数
+  const handleLogout = () => {
+    localStorage.removeItem('user'); // 清除localStorage中的用户信息
+    setUser(null);
+  };
 
   return (
     <Router>
