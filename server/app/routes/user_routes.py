@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, session
 from flask import jsonify, request
 from app.routes import bp
 from app.models import Users, Customer
@@ -105,6 +105,7 @@ def login():
             if not customer:
                 return jsonify({'error': 'Associated customer not found'}), 404
             customer_id = customer.customer_id
+
         return jsonify({
             'user': {
                 'user_id': user.user_id,
