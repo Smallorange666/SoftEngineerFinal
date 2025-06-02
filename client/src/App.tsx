@@ -47,7 +47,6 @@ function getItem(
 const customerSidebarItems: MenuItem[] = [
   getItem("车辆清单", "1", <CarOutlined />),
   getItem("我的租赁", "2", <AuditOutlined />),
-  getItem("余额查询", "balance", <AuditOutlined />),
 ];
 
 // 管理员侧边栏项
@@ -108,10 +107,6 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
   const navigate = useNavigate();
 
   const handleMenuClick = (e: any) => {
-    if (e.key === 'balance') {
-      setIsCheckMoneyModalOpen(true);
-      return;
-    }
     setSelectedKey(e.key);
   };
 
@@ -143,6 +138,12 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
           label: "账号信息",
           icon: <SettingOutlined />,
           onClick: () => setIsProfileModalVisible(true),
+        },
+        {
+          key: "money",
+          label: "余额查询",
+          icon: <AuditOutlined />,
+          onClick: () => setIsCheckMoneyModalOpen(true),
         },
         commonItems[0],
         {
