@@ -120,6 +120,8 @@ def update_customer(customer_id):
         if 'phone' in data and data['phone'] != customer.phone:
             if not PHONE_NUMBER_PATTERN.match(data['phone']):
                 return jsonify({'error': 'Invalid phone number format'}), 400
+            if Customer.query.filter_by(phone=data['phone']).filter_by(is_deleted=False).first():
+                return jsonify({'error': 'Phone already exists, please contact Admin to modify'}), 400
             customer.phone = data['phone']
 
         # 更新地址

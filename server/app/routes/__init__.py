@@ -6,3 +6,4 @@ from app.routes import user_routes
 from app.routes import rental_routes
 from app.routes import vehicle_routes
 from app.routes import customer_routes
+from app.routes import money_routes

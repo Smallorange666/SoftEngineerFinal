@@ -23,6 +23,7 @@ import CancelledRentalPage from "./subpages/CancelledRentalPage";
 import UpdateProfileModal from "./modals/UpdateProfileModal";
 import ModifyPasswordModal from "./modals/ModifyPasswordModal";
 import DeleteAccountModal from "./modals/DeleteAccountModal";
+import CheckMoneyModal from "./modals/CheckMoneyModal";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -46,6 +47,7 @@ function getItem(
 const customerSidebarItems: MenuItem[] = [
   getItem("车辆清单", "1", <CarOutlined />),
   getItem("我的租赁", "2", <AuditOutlined />),
+  getItem("余额查询", "balance", <AuditOutlined />),
 ];
 
 // 管理员侧边栏项
@@ -98,6 +100,7 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
     useState(false);
   const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] =
     useState(false);
+  const [isCheckMoneyModalOpen, setIsCheckMoneyModalOpen] = useState(false);
 
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -105,6 +108,10 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
   const navigate = useNavigate();
 
   const handleMenuClick = (e: any) => {
+    if (e.key === 'balance') {
+      setIsCheckMoneyModalOpen(true);
+      return;
+    }
     setSelectedKey(e.key);
   };
 
@@ -269,6 +276,13 @@ const App: React.FC<AppProps> = ({ user, onLogout }) => {
           message.info("账号已注销");
         }}
       />
+      
+      <CheckMoneyModal
+        customer_id={user.customer_id}
+        open={isCheckMoneyModalOpen}
+        onClose={() => setIsCheckMoneyModalOpen(false)}
+      />
+      
     </Layout>
   );
 };
