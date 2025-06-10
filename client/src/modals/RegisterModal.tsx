@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Form, Input, message } from "antd";
+import { API_BASE_URL } from "../config";
 
 interface RegisterModalProps {
   open: boolean;
@@ -33,7 +34,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({
     setLoading(true);
     try {
       // 调用后端 API 注册用户
-      const response = await fetch("http://localhost:5000/api/register", {
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

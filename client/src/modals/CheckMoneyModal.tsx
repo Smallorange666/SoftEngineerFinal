@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, InputNumber, Form, Button, Typography, message } from 'antd';
-
-const API_BASE_URL = "http://localhost:5000/api";
+import { API_BASE_URL } from "../config";
 
 interface Props {
   customer_id: number;

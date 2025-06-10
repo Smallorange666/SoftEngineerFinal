@@ -14,16 +14,27 @@ const Root: React.FC = () => {
     user_id: number;
     username: string;
     role: string;
-    customer_id: number | null;
+    customer_id: number;
   } | null>(() => {
     const savedUser = localStorage.getItem('user');
     return savedUser ? JSON.parse(savedUser) : null;
   }); // 用户状态
 
-  // 登出处理函数
+  // 登录成功时，保存到 localStorage
+  const handleLogin = (user: {
+    user_id: number;
+    username: string;
+    role: string;
+    customer_id: number;
+  }) => {
+    setUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
+  };
+
+  // 登出时，清除 localStorage
   const handleLogout = () => {
-    localStorage.removeItem('user'); // 清除localStorage中的用户信息
     setUser(null);
+    localStorage.removeItem('user');
   };
 
   return (
@@ -33,7 +44,7 @@ const Root: React.FC = () => {
           path="/"
           element={
             user ? (
-              <App user={user} onLogout={() => setUser(null)} />
+              <App user={user} onLogout={handleLogout} />
             ) : (
               <Navigate to="/login" replace />
             )
@@ -43,7 +54,7 @@ const Root: React.FC = () => {
           path="/login"
           element={
             <LoginPage
-              onLoginSuccess={(user) => setUser(user)} // 登录成功后更新用户状态
+              onLoginSuccess={handleLogin} // 登录成功后更新用户状态
             />
           }
         />

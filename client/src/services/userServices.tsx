@@ -1,14 +1,13 @@
 import { message } from "antd";
-import { User } from "../types";
-
-const API_BASE_URL = "http://localhost:5000/api";
+import { User } from "../types/common";
+import { API_BASE_URL } from "../config";
 
 export const login = async (
   username: string,
   password: string
 ): Promise<User> => {
   try {
-    const response = await fetch("http://localhost:5000/api/login", {
+    const response = await fetch(`${API_BASE_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
