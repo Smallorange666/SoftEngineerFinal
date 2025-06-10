@@ -2,8 +2,9 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app import create_app, db
+from app import create_app
 from app.models import Vehicle
+
 
 def test_connection():
     app = create_app()
@@ -17,5 +18,6 @@ def test_connection():
         except Exception as e:
             print(f"连接数据库时出错: {str(e)}")
 
+
 if __name__ == '__main__':
-    test_connection() 
+    test_connection()

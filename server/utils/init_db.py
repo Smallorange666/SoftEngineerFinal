@@ -2,14 +2,15 @@ from werkzeug.security import generate_password_hash
 import json
 import os
 import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.models import Users
 from app.models import Vehicle
 from app import create_app, db
 
-def init_db():
 
+def init_db():
     app = create_app()
     with app.app_context():
         # 清除所有表
@@ -36,7 +37,7 @@ def init_db():
                     model=vehicle["model"],
                     color=vehicle["color"],
                     price_per_day=vehicle["price_per_day"],
-                    plate_number=vehicle["plate_number"]
+                    plate_number=vehicle["plate_number"],
                 )
                 for vehicle in vehicles_data
             ]
@@ -48,15 +49,14 @@ def init_db():
         # 添加一个管理员账号和一个普通用户账号
         if Users.query.count() == 0:
             admin = Users(
-                username='admin',
-                password_hash=generate_password_hash(
-                    'admin'),  # 使用 bcrypt 哈希密码
-                role='admin',
+                username="admin",
+                password_hash=generate_password_hash("admin"),  # 使用 bcrypt 哈希密码
+                role="admin",
             )
             db.session.add(admin)
             db.session.commit()
             print("成功添加管理员账号！")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     init_db()
